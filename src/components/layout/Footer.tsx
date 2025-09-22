@@ -33,7 +33,7 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-2">
-              <li><a href="mailto:support@oceanguard.in" className="text-gray-400 hover:text-white transition-colors">support@oceanguard.in</a></li>
+              <li><a href="mailto:support@wavescope.in" className="text-gray-400 hover:text-white transition-colors">support@wavescope.in</a></li>
               <li><a href="tel:+919876543210" className="text-gray-400 hover:text-white transition-colors">+91 9876543210</a></li>
               <li className="text-gray-400">INCOIS, Hyderabad</li>
             </ul>
@@ -42,7 +42,7 @@ export function Footer() {
       </div>
       <div className="bg-gray-900 py-4">
         <div className="container mx-auto px-4 text-center text-gray-500">
-          <p>&copy; {new Date().getFullYear()} OceanGuard | Developed in collaboration with INCOIS</p>
+          <p>&copy; {new Date().getFullYear()} WaveScope | Developed in collaboration with INCOIS</p>
         </div>
       </div>
     </footer>

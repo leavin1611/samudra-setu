@@ -13,7 +13,7 @@ export function LoginForm() {
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl">Login to Your Account</CardTitle>
-          <CardDescription>Access your OceanGuard dashboard and reporting tools</CardDescription>
+          <CardDescription>Access your WaveScope dashboard and reporting tools</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
