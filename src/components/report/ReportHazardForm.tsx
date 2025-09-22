@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Upload } from 'lucide-react';
+import { Upload, BellRing } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { useHazardReports } from '@/context/HazardReportsContext';
@@ -44,6 +44,9 @@ export function ReportHazardForm() {
     });
 
     function onSubmit(values: z.infer<typeof reportSchema>) {
+        // Simulate a chance of the report being instantly verified
+        const isVerified = Math.random() > 0.5;
+
         const newReport = {
             id: Date.now(),
             title: `${values.hazardType.charAt(0).toUpperCase() + values.hazardType.slice(1)} in ${values.location}`,
@@ -51,21 +54,33 @@ export function ReportHazardForm() {
             timeAgo: "Just now",
             description: values.description,
             tags: [values.hazardType, values.location],
-            verified: false,
+            verified: isVerified,
             type: values.hazardType as any,
             severity: values.severity as any,
             location: values.location,
             date: new Date(`${values.date}T${values.time}`).toISOString(),
             imageUrl: "https://picsum.photos/seed/" + Date.now() + "/400/200",
             imageHint: `${values.hazardType} ${values.location}`,
-            lat: 11.23, // Placeholder lat
-            lng: 78.34, // placeholder lng
+            lat: 11.23 + (Math.random() - 0.5) * 5, // Placeholder lat with randomness
+            lng: 78.34 + (Math.random() - 0.5) * 5, // placeholder lng with randomness
         };
         addReport(newReport);
+        
         toast({
             title: "Report Submitted!",
             description: "Thank you for contributing to community safety.",
         });
+
+        if (isVerified) {
+             setTimeout(() => {
+                toast({
+                    variant: "default",
+                    title: "🔔 New Verified Hazard Alert!",
+                    description: `A new ${newReport.severity} risk ${values.hazardType} has been verified in ${values.location}.`,
+                });
+            }, 1000);
+        }
+
         form.reset();
     }
 
