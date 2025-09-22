@@ -5,6 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Filters } from './Filters';
 import { MapWrapper } from './MapWrapper';
 import { Stats } from './Stats';
+import Link from 'next/link';
+import { Button } from '../ui/button';
 
 export type FiltersState = {
   hazardType: string;
@@ -47,6 +49,11 @@ export function Dashboard() {
           <div className="lg:col-span-2">
             <MapWrapper />
           </div>
+        </div>
+         <div className="text-center mt-12">
+          <Button asChild size="lg">
+            <Link href="/dashboard">View Full Dashboard</Link>
+          </Button>
         </div>
       </div>
     </section>
