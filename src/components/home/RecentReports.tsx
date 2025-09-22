@@ -1,3 +1,4 @@
+
 'use client';
 
 import { HazardReportCard } from '../common/HazardReportCard';
@@ -21,7 +22,7 @@ export function RecentReports() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {Array.from({ length: 4 }).map((_, i) => (
+            {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="space-y-4">
                 <Skeleton className="h-48 w-full" />
                 <Skeleton className="h-6 w-3/4" />
@@ -48,7 +49,7 @@ export function RecentReports() {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {reports.slice(0, 4).map((report) => (
+          {reports.slice(0, 8).map((report) => (
             <HazardReportCard key={report.id} report={report} />
           ))}
         </div>
