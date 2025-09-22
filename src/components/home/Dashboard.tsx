@@ -7,6 +7,7 @@ import { MapWrapper } from './MapWrapper';
 import { Stats } from './Stats';
 import Link from 'next/link';
 import { Button } from '../ui/button';
+import { useHazardReports } from '@/context/HazardReportsContext';
 
 export type FiltersState = {
   hazardType: string;
@@ -22,6 +23,7 @@ export function Dashboard() {
     location: '',
     severity: 'all',
   });
+  const { reports } = useHazardReports();
 
   return (
     <section id="dashboard" className="py-12 md:py-20">
@@ -47,7 +49,7 @@ export function Dashboard() {
             </Card>
           </div>
           <div className="lg:col-span-2">
-            <MapWrapper />
+            <MapWrapper reports={reports} />
           </div>
         </div>
          <div className="text-center mt-12">

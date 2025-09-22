@@ -3,12 +3,11 @@
 import { useEffect, useRef } from 'react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
-import { useHazardReports } from '@/context/HazardReportsContext';
+import { HazardReport } from '@/lib/data';
 
-export function MapWrapper() {
+export function MapWrapper({ reports }: { reports: HazardReport[] }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const isMapLoaded = useRef(false);
-  const { reports } = useHazardReports();
 
   const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "AIzaSyAwNOYjQTLk42O-JpKHXGvxkraaMU8Oldc";
 
