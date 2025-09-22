@@ -1,10 +1,11 @@
+
 'use client';
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/common/Logo';
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher';
-import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 import { Menu } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { translations } from '@/lib/i18n';
@@ -55,6 +56,9 @@ export function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="bg-primary text-primary-foreground border-l-0">
+                <SheetHeader>
+                    <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
+                </SheetHeader>
                 <div className="flex flex-col gap-6 pt-10">
                 <nav className="flex flex-col items-start gap-4">
                     {navLinks.map((link) => (
@@ -85,3 +89,4 @@ export function Header() {
     </header>
   );
 }
+
