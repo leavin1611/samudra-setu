@@ -24,18 +24,14 @@ export function SocialStats() {
 
         setMentionCount(feeds.length);
 
-        const analysisPromises: Promise<AnalyzeSocialMediaSentimentOutput>[] = feeds
-          .filter(feed => feed.comments || feed.hashtags)
-          .map(feed => {
-            const query = `${feed.comments || ''} ${feed.hashtags || ''}`.trim();
-            return analyzeSocialMediaSentiment({ query });
-          });
-
-        const results = await Promise.all(analysisPromises);
+        const allText = feeds
+          .map(feed => `${feed.comments || ''} ${feed.hashtags || ''}`.trim())
+          .filter(text => text.length > 0)
+          .join('\n\n');
         
-        if (results.length > 0) {
-            const averageUrgency = results.reduce((sum, result) => sum + result.urgencyScore, 0) / results.length;
-            setUrgencyScore(averageUrgency);
+        if (allText.length > 0) {
+          const result = await analyzeSocialMediaSentiment({ query: allText });
+          setUrgencyScore(result.urgencyScore);
         }
 
       } catch (err) {
