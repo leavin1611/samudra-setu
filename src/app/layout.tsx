@@ -7,7 +7,7 @@ import { HazardReportsProvider } from '@/context/HazardReportsContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 
 export const metadata: Metadata = {
-  title: 'WaveScope - Crowdsourced Ocean Hazard Reporting',
+  title: 'SamudraSetu - Crowdsourced Ocean Hazard Reporting',
   description: 'Protecting Coastal Communities Through Crowdsourced Intelligence',
 };
 
