@@ -2,6 +2,24 @@
 
 This is a Next.js project created in Firebase Studio. It's a comprehensive platform for crowdsourcing, visualizing, and analyzing ocean hazard information to protect coastal communities.
 
+## Project Summary
+
+**SamudraSetu** is an AI-driven platform designed to bridge the gap in coastal safety by creating a unified intelligence loop. It addresses the problems of misinformation, slow reporting, and disconnected data by leveraging cutting-edge AI at every step.
+
+*   **The Problem:** Current hazard reporting is chaotic, relying on slow manual processes and unverified social media chatter, which leads to public confusion and delayed responses from authorities.
+
+*   **Our Solution (The AI Intelligence Loop):**
+    1.  **Report (AI-Assisted):** Citizens easily report hazards. Our AI (Gemini) analyzes uploaded photos to instantly pre-fill report details, ensuring speed and accuracy.
+    2.  **Analyze (AI-Verified):** A specialized AI (BERT) scores the authenticity of reports to filter out hoaxes, while another AI (Gemini) analyzes social media for public sentiment and urgency.
+    3.  **Visualize (Unified Dashboard):** All verified data is plotted on a single, live map with heatmaps and hotspots, providing a clear and immediate operating picture.
+    4.  **Alert (Actionable Intelligence):** Disaster managers get real-time, verified intelligence, enabling faster and more effective community alerts.
+
+*   **Key Innovations:**
+    *   **AI at the Point of Reporting:** Using AI to auto-fill reports from images, not just for backend analysis.
+    *   **Dual-Layer Authenticity:** Combining AI text analysis with human credibility to create a robust verification system.
+    *   **Data Fusion:** Uniquely integrating formal crowdsourced reports with unstructured social media intelligence for a complete hazard picture.
+
+
 ## Getting Started Locally
 
 To run this project on your local machine using Visual Studio Code, follow these steps.
@@ -23,7 +41,7 @@ The project requires an API key for Google Maps.
 2.  Ensure it contains your Google Maps API key, like so:
 
     ```
-    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=YOUR_API_KEY_HERE
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyAwNOYjQTLk42O-JpKHXGvxkraaMU8Oldc
     ```
 
 ### 4. Install Dependencies
