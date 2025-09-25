@@ -16,7 +16,7 @@ import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 const phoneSchema = z.object({
-  phoneNumber: z.string().min(10, 'Please enter a valid phone number with country code'),
+  phoneNumber: z.string().regex(/^\+[1-9]\d{1,14}$/, 'Phone number must be in E.164 format (e.g., +919876543210)'),
 });
 
 const otpSchema = z.object({
@@ -130,7 +130,7 @@ export function PhoneLoginForm() {
                   <Label htmlFor="phoneNumber">Phone Number</Label>
                   <Input
                     id="phoneNumber"
-                    placeholder="+91 98765 43210"
+                    placeholder="+919876543210"
                     {...phoneForm.register('phoneNumber')}
                   />
                   {phoneForm.formState.errors.phoneNumber && (
