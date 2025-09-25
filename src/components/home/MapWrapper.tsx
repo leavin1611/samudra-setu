@@ -100,7 +100,6 @@ export function MapWrapper({ reports }: { reports: HazardReport[] }) {
     
     if (!window.google?.maps) {
       if (!API_KEY) {
-        console.error("Google Maps API key is missing.");
         return;
       }
       const script = document.createElement("script");
