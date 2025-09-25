@@ -1,14 +1,20 @@
-
 'use client';
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/common/Logo';
 import { GoogleTranslateWidget } from '@/components/common/GoogleTranslateWidget';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
-import { Menu } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
+import { LogOut, Menu } from 'lucide-react';
+import { useAuth, useUser } from '@/firebase';
 
 export function Header() {
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
+
+  const handleSignOut = () => {
+    auth.signOut();
+  };
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -36,12 +42,33 @@ export function Header() {
             ))}
           </nav>
           <div className="hidden lg:flex items-center gap-4">
-            <Button variant="outline" className="bg-transparent border-white text-white hover:bg-white/10" asChild>
-                <Link href="/login">Login</Link>
-            </Button>
-            <Button variant="default" className="bg-white text-primary hover:bg-white/90" asChild>
-                <Link href="/signup">Sign Up</Link>
-            </Button>
+            {!isUserLoading && (
+              <>
+                {user ? (
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-white">{user.phoneNumber || user.email}</span>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="bg-transparent border-white text-white hover:bg-white/10"
+                      onClick={handleSignOut}
+                      title="Sign Out"
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <Button variant="outline" className="bg-transparent border-white text-white hover:bg-white/10" asChild>
+                      <Link href="/login">Login</Link>
+                    </Button>
+                    <Button variant="default" className="bg-white text-primary hover:bg-white/90" asChild>
+                      <Link href="/signup">Sign Up</Link>
+                    </Button>
+                  </>
+                )}
+              </>
+            )}
             <GoogleTranslateWidget />
           </div>
           <div className="lg:hidden">
@@ -52,30 +79,46 @@ export function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="bg-primary text-primary-foreground border-l-0">
-                <SheetHeader>
-                    <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
-                </SheetHeader>
                 <div className="flex flex-col gap-6 pt-10">
-                <nav className="flex flex-col items-start gap-4">
+                  <nav className="flex flex-col items-start gap-4">
                     {navLinks.map((link) => (
-                    <Link
+                      <Link
                         key={link.label}
                         href={link.href}
                         className="text-white text-lg font-medium transition-opacity hover:opacity-80"
-                    >
+                      >
                         {link.label}
-                    </Link>
+                      </Link>
                     ))}
-                </nav>
-                <div className="flex flex-col gap-4">
-                    <Button variant="outline" className="bg-transparent border-white text-white hover:bg-white/10" asChild>
-                        <Link href="/login">Login</Link>
-                    </Button>
-                    <Button variant="default" className="bg-white text-primary hover:bg-white/90" asChild>
-                        <Link href="/signup">Sign Up</Link>
-                    </Button>
+                  </nav>
+                  <div className="flex flex-col gap-4">
+                    {!isUserLoading && (
+                      <>
+                        {user ? (
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-white">{user.phoneNumber || user.email}</span>
+                            <Button
+                              variant="outline"
+                              className="bg-transparent border-white text-white hover:bg-white/10"
+                              onClick={handleSignOut}
+                            >
+                              Sign Out
+                            </Button>
+                          </div>
+                        ) : (
+                          <>
+                            <Button variant="outline" className="bg-transparent border-white text-white hover:bg-white/10" asChild>
+                              <Link href="/login">Login</Link>
+                            </Button>
+                            <Button variant="default" className="bg-white text-primary hover:bg-white/90" asChild>
+                              <Link href="/signup">Sign Up</Link>
+                            </Button>
+                          </>
+                        )}
+                      </>
+                    )}
                     <GoogleTranslateWidget />
-                </div>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
