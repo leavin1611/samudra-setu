@@ -46,6 +46,59 @@ The core of the solution is a **four-stage intelligence loop**:
 *   **Dual-Layer Authenticity:** Combining AI text analysis with human credibility to create a robust verification system.
 *   **Data Fusion:** Uniquely integrating formal crowdsourced reports with unstructured social media intelligence for a complete hazard picture.
 
+### How SamudraSetu Works: A Detailed Walkthrough
+
+This description breaks down the entire process from a user's first interaction to the final visualization of their report, detailing the flow of data between the frontend, the AI backend, and external services.
+
+**Step 1: User Authentication**
+*   **Action:** A user visits the SamudraSetu website and clicks the "Login" button.
+*   **Process:**
+    *   They are directed to the `PhoneLoginForm`.
+    *   The user enters their phone number in E.164 format (e.g., +919876543210).
+    *   An invisible **Google reCAPTCHA** is triggered to verify the user is not a bot.
+    *   Upon successful verification, the frontend calls **Firebase Authentication's** `signInWithPhoneNumber` function.
+    *   Firebase sends a one-time password (OTP) to the user's mobile device.
+    *   The user enters the 6-digit OTP, which is then verified by Firebase.
+    *   Upon successful verification, the user is logged in and authenticated for the session.
+
+**Step 2: Initiating a Hazard Report**
+*   **Action:** The authenticated user observes a potential hazard and navigates to the "Report a Hazard" page.
+*   **Process:** The `ReportHazardForm` component is rendered, presenting the user with an upload area and a form.
+
+**Step 3: AI-Powered Image Analysis**
+*   **Action:** The user clicks "Click to upload an image" and selects a photo of the hazard from their device.
+*   **Process:**
+    *   The frontend reads the selected image file.
+    *   It uses the `FileReader` API to convert the image into a **Base64-encoded Data URI**. This is a text string that represents the image (e.g., `data:image/jpeg;base64,...`).
+    *   The frontend makes an API call to the backend **Genkit AI Flow**: `analyzeReportImage`, sending the Data URI as a parameter.
+    *   The Genkit flow forwards the image data and a specific text prompt to the **Google Gemini multimodal model**.
+    *   The Gemini model analyzes the visual content of the image based on the prompt's instructions.
+    *   The model returns a structured **JSON object** containing its analysis, like `{ "hazardType": "flooding", "severity": "high", "description": "Coastal road is submerged..." }`.
+
+**Step 4: Form Pre-population and User Submission**
+*   **Action:** The user sees the form fields automatically populated and submits the report.
+*   **Process:**
+    *   The frontend receives the JSON response from the Genkit flow.
+    *   It uses this data to **automatically set the values** for the "Hazard Type," "Severity Level," and "Description" fields in the form.
+    *   The user reviews the AI-generated information, manually fills in the remaining fields (Location, Date, Time), and clicks the "Submit Report" button.
+
+**Step 5: Data Processing and Authenticity Verification**
+*   **Action:** The submitted report is processed and verified by the system.
+*   **Process:**
+    *   The new report data is added to the application's central state using the `addReport` function from `HazardReportsContext`. This makes it immediately available to all components.
+    *   Simultaneously, the text from the report's `description` is sent to another Genkit flow: `verifyReportAuthenticity`.
+    *   This flow uses a fine-tuned **BERT model** (`xenova/bert-base-cased-fakeddit`) to analyze the text for patterns of misinformation.
+    *   The BERT model returns an **authenticity score** (e.g., 0.9 for "likely real").
+    *   Based on this score, the report is programmatically marked with a `verified: true` or `verified: false` flag.
+
+**Step 6: Real-time Visualization and Alerting**
+*   **Action:** The newly created and verified report instantly appears on the platform for all users.
+*   **Process:**
+    *   The **Live Hazard Dashboard** automatically re-renders because its data source (`HazardReportsContext`) has been updated.
+    *   The new report appears as a pin on the interactive **Google Map**. The pin's color or icon can reflect its verification status.
+    *   Key statistics on the dashboard, such as "Total Reports" and "Verified Incidents," are updated in real time.
+    *   If the report was successfully verified, a system-wide toast notification is triggered to alert all active users of the new, credible threat.
+
 ## Getting Started Locally
 
 To run this project on your local machine using Visual Studio Code, follow these steps.
@@ -108,30 +161,25 @@ You are now all set! Open your browser to `http://localhost:9002` to see your ap
 
 ### 1. AI Models & Natural Language Processing
 
-*   **BERT (Bidirectional Encoder Representations from Transformers):** The core algorithm for our authenticity scoring. Its ability to understand deep context in language is critical for identifying misinformation.
-    *   **Reference Paper:** Devlin, J., Chang, M. W., Lee, K., & Toutanova, K. (2018). "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding."
-    *   **Link:** [https://arxiv.org/abs/1810.04805](https://arxiv.org/abs/1810.04805)
+*   **BERT (Bidirectional Encoder Representations from Transformers):** The core algorithm for our authenticity scoring, using a model fine-tuned on the Fakeddit dataset to spot misinformation.
+    *   **Paper:** [arxiv.org/abs/1810.04805](https://arxiv.org/abs/1810.04805)
+    *   **Dataset:** [arxiv.org/abs/1911.03854](https://arxiv.org/abs/1911.03854)
 
-*   **Google Gemini (Multimodal Models):** The model family powering our image analysis and social media intelligence features.
-    *   **Reference:** Google. (2023). "Gemini: A Family of Highly Capable Multimodal Models."
-    *   **Link:** [https://deepmind.google/technologies/gemini/](https://deepmind.google/technologies/gemini/)
-
-*   **Misinformation Detection:** The fine-tuned BERT model we use (`xenova/bert-base-cased-fakeddit`) is based on research into detecting fake news.
-    *   **Fakeddit Dataset Paper:** Nakamura, K., Levy, S., & Ttoy, W. C. (2020). "Fakeddit: A New Multimodal Benchmark Dataset for Fine-grained Fake News Detection."
-    *   **Link:** [https://arxiv.org/abs/1911.03854](https://arxiv.org/abs/1911.03854)
+*   **Google Gemini (Multimodal Models):** The model family powering our image analysis (photo-to-report) and social media intelligence features.
+    *   **Reference:** [deepmind.google/technologies/gemini](https://deepmind.google/technologies/gemini/)
 
 ### 2. Crowdsourcing in Disaster Management
 
-*   **Ushahidi Platform:** A pioneering open-source project that uses crowdsourcing for social activism and public accountability, demonstrating the power of citizen reporting.
-    *   **Link:** [https://www.ushahidi.com/](https://www.ushahidi.com/)
+*   **Ushahidi Platform:** A pioneering open-source project that proved the effectiveness of using citizen reporting for crisis mapping and social accountability.
+    *   **Link:** [www.ushahidi.com](https://www.ushahidi.com/)
 
-*   **Academic Research:** Studies have validated the effectiveness of using crowdsourced geographic information during disasters.
-    *   **Reference Paper:** Poser, K., & Dransch, D. (2010). "Volunteered Geographic Information for disaster management with application to rapid flood damage estimation."
+*   **Volunteered Geographic Information (VGI):** Academic research validating the use of crowdsourced geographic data during disasters for tasks like rapid flood damage estimation.
+    *   **See:** Poser, K., & Dransch, D. (2010).
 
 ### 3. Coastal Hazard & Disaster Management
 
-*   **Indian National Centre for Ocean Information Services (INCOIS):** The primary stakeholder and source for the problem statement.
-    *   **Link:** [https://www.incois.gov.in/](https://www.incois.gov.in/)
+*   **Indian National Centre for Ocean Information Services (INCOIS):** The primary stakeholder and source for the problem statement. Their work provides the official framework for our solution.
+    *   **Link:** [www.incois.gov.in](https://www.incois.gov.in/)
 
-*   **National Disaster Management Authority (NDMA), India:** The apex body for disaster management in India, providing strategic context.
-    *   **Link:** [https://ndma.gov.in/](https://ndma.gov.in/)
+*   **National Disaster Management Authority (NDMA), India:** The apex body for disaster management in India, providing the strategic context for integrating technology into national response plans.
+    *   **Link:** [ndma.gov.in](https://ndma.gov.in/)
