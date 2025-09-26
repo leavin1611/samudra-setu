@@ -102,14 +102,23 @@ export function MapWrapper({ reports }: { reports: HazardReport[] }) {
       if (!API_KEY) {
         return;
       }
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=visualization`;
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-      script.onload = () => {
-        initMap();
-      };
+      
+      const scriptId = 'google-maps-script';
+      const existingScript = document.getElementById(scriptId);
+
+      if (!existingScript) {
+        const script = document.createElement("script");
+        script.id = scriptId;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=visualization`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+        script.onload = () => {
+          initMap();
+        };
+      } else {
+         initMap();
+      }
     } else {
       initMap();
     }
