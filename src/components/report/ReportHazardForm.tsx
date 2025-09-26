@@ -16,11 +16,14 @@ import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { useHazardReports } from '@/context/HazardReportsContext';
 import { analyzeReportImage } from '@/ai/flows/analyze-report-image';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect }d from 'react';
 import Image from 'next/image';
 import { Skeleton } from '../ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import EXIF from 'exif-js';
+import { format } from 'date-fns';
+
 
 const reportSchema = z.object({
   hazardType: z.string().min(1, 'Hazard type is required'),
@@ -142,11 +145,33 @@ export function ReportHazardForm() {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            processImageWithAI(reader.result as string);
-        };
+        EXIF.getData(file as any, function(this: any) {
+            const lat = EXIF.getTag(this, "GPSLatitude");
+            const lon = EXIF.getTag(this, "GPSLongitude");
+
+            if (!lat || !lon) {
+                toast({
+                    variant: "destructive",
+                    title: "Geo-tag Required",
+                    description: "Uploaded photos must contain geo-tag (GPS) information. Please upload a different photo.",
+                });
+                return;
+            }
+
+            const latRef = EXIF.getTag(this, "GPSLatitudeRef") || "N";
+            const lonRef = EXIF.getTag(this, "GPSLongitudeRef") || "E";
+            
+            const latDec = (lat[0] + lat[1] / 60 + lat[2] / 3600) * (latRef === "S" ? -1 : 1);
+            const lonDec = (lon[0] + lon[1] / 60 + lon[2] / 3600) * (lonRef === "W" ? -1 : 1);
+            
+            form.setValue('location', `${latDec.toFixed(5)}, ${lonDec.toFixed(5)}`);
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                processImageWithAI(reader.result as string);
+            };
+        });
     };
 
     const handleTakePhoto = () => {
@@ -167,6 +192,12 @@ export function ReportHazardForm() {
         
         // Get the image data from the canvas
         const photoDataUri = canvas.toDataURL('image/jpeg');
+
+        // Set current date and time
+        const now = new Date();
+        form.setValue('date', format(now, 'yyyy-MM-dd'));
+        form.setValue('time', format(now, 'HH:mm'));
+
         processImageWithAI(photoDataUri);
     }
 
@@ -250,8 +281,8 @@ export function ReportHazardForm() {
                                     htmlFor="file-upload"
                                     className="relative cursor-pointer rounded-md bg-background font-semibold text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 hover:text-primary/80"
                                     >
-                                    <span>Click to upload an image</span>
-                                    <Input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleImageUpload} accept="image/*" />
+                                    <span>Click to upload a geo-tagged image</span>
+                                    <Input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleImageUpload} accept="image/jpeg,image/png" />
                                     </Label>
                                 </div>
                                 <p className="text-xs leading-5 text-muted-foreground">The AI will pre-fill the form for you.</p>
@@ -382,3 +413,5 @@ export function ReportHazardForm() {
     </div>
   );
 }
+
+    
