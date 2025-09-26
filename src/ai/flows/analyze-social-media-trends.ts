@@ -13,7 +13,7 @@ import { z } from 'zod';
 
 // Define the shape of a single social media post
 const PostSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   user_handle: z.string(),
   hazard_type: z.string(),
   location_name: z.string(),
