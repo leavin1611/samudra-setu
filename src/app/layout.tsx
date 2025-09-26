@@ -5,6 +5,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Toaster } from '@/components/ui/toaster';
 import { HazardReportsProvider } from '@/context/HazardReportsContext';
 import { FirebaseClientProvider } from '@/firebase';
+import { NeedsProvider } from '@/context/NeedsContext';
 
 export const metadata: Metadata = {
   title: 'SamudraSetu - Crowdsourced Ocean Hazard Reporting',
@@ -26,14 +27,16 @@ export default function RootLayout({
       <body className="font-body antialiased" suppressHydrationWarning>
           <FirebaseClientProvider>
             <HazardReportsProvider>
-              <div className="flex flex-col min-h-screen">
-                  <Header />
-                  <main className="flex-grow">
-                      {children}
-                  </main>
-                  <Footer />
-              </div>
-              <Toaster />
+              <NeedsProvider>
+                <div className="flex flex-col min-h-screen">
+                    <Header />
+                    <main className="flex-grow">
+                        {children}
+                    </main>
+                    <Footer />
+                </div>
+                <Toaster />
+              </NeedsProvider>
             </HazardReportsProvider>
           </FirebaseClientProvider>
       </body>

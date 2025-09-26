@@ -22,6 +22,7 @@ export function Header() {
     { href: '/alerts', label: 'Alerts' },
     { href: '/social-intelligence', label: 'Social Intel' },
     { href: '/report', label: 'Report Hazard' },
+    { href: '/needs', label: 'Report a Need' },
   ];
 
   return (

@@ -332,6 +332,24 @@
         "author",
         "postDate"
       ]
+    },
+    "NeedRequest": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "NeedRequest",
+        "type": "object",
+        "description": "Represents a request for assistance from a user during a hazard.",
+        "properties": {
+            "id": { "type": "string", "description": "Unique ID for the request." },
+            "userId": { "type": "string", "description": "ID of the user making the request." },
+            "hazardReportId": { "type": "string", "description": "Optional ID of a related hazard report." },
+            "needType": { "type": "string", "description": "Type of need (e.g., Water, Food, Medical, Shelter, Rescue)." },
+            "location": { "type": "string", "description": "Location of the person in need." },
+            "description": { "type": "string", "description": "Detailed description of the situation and need." },
+            "isUrgent": { "type": "boolean", "description": "Whether the request is marked as urgent." },
+            "requestDate": { "type": "string", "format": "date-time", "description": "When the request was submitted." },
+            "status": { "type": "string", "description": "Current status (Open, In-Progress, Fulfilled)." }
+        },
+        "required": ["id", "userId", "needType", "location", "description", "requestDate", "status"]
     }
   },
   "auth": {
@@ -414,8 +432,24 @@
             }
           ]
         }
+      },
+      {
+        "path": "/needRequests/{needRequestId}",
+        "definition": {
+          "entityName": "NeedRequest",
+          "schema": {
+            "$ref": "#/backend/entities/NeedRequest"
+          },
+          "description": "Stores requests for assistance from users in affected areas. Kept in a separate collection for easy querying by volunteers and managers.",
+          "params": [
+            {
+              "name": "needRequestId",
+              "description": "The unique identifier for the need request."
+            }
+          ]
+        }
       }
     ],
-    "reasoning": "This Firestore structure prioritizes Authorization Independence and QAPs. The core strategy revolves around path-based ownership for user-related data and separate collections for global data. Aadhar verification details are stored within a subcollection of the user, ensuring data locality and ease of management. Denormalization is used to avoid complex `get()` calls in security rules.\n\n1.  **Users Collection:** `/users/{userId}` stores user profiles.  This uses path-based ownership for simple security rules.\n2.  **AadharVerification Subcollection:** `/users/{userId}/aadharVerifications/{verificationId}` stores Aadhar verification requests. Storing it as a subcollection ensures that verification data is always tied to a specific user, simplifying security rules and data management.  Crucially, it allows secure creation since the user document already exists (or will be created in the same atomic batch).  This avoids `get()` calls in the security rules.\n3.  **HazardReports Collection:** `/users/{userId}/hazardReports/{hazardReportId}` stores reports created by a user.\n4.  **SocialMediaPosts Collection:** `/socialMediaPosts/{socialMediaPostId}`. This segregation supports QAPs by allowing listing all posts without requiring filtering based on user roles or permissions within the rules themselves."
+    "reasoning": "This Firestore structure prioritizes Authorization Independence and QAPs. The core strategy revolves around path-based ownership for user-related data and separate collections for global data. Aadhar verification details are stored within a subcollection of the user, ensuring data locality and ease of management. Denormalization is used to avoid complex `get()` calls in security rules.\n\n1.  **Users Collection:** `/users/{userId}` stores user profiles.  This uses path-based ownership for simple security rules.\n2.  **AadharVerification Subcollection:** `/users/{userId}/aadharVerifications/{verificationId}` stores Aadhar verification requests. Storing it as a subcollection ensures that verification data is always tied to a specific user, simplifying security rules and data management.  Crucially, it allows secure creation since the user document already exists (or will be created in the same atomic batch).  This avoids `get()` calls in the security rules.\n3.  **HazardReports Collection:** `/users/{userId}/hazardReports/{hazardReportId}` stores reports created by a user.\n4.  **SocialMediaPosts Collection:** `/socialMediaPosts/{socialMediaPostId}`. This segregation supports QAPs by allowing listing all posts without requiring filtering based on user roles or permissions within the rules themselves.\n5.  **NeedRequests Collection:** `/needRequests/{needRequestId}`. A separate collection for assistance requests allows volunteers and managers to query all open needs without complex user-based lookups, speeding up response times."
   }
 }
