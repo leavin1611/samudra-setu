@@ -97,9 +97,9 @@ export function HighPriorityAlert() {
                 <p className="text-lg">
                     <span className="font-semibold">Hazard:</span> <span className="capitalize">{highestAlert.type}</span>
                 </p>
-                 <p className="text-lg">
+                 <div className="text-lg flex items-center gap-2">
                     <span className="font-semibold">Severity:</span> <Badge variant="destructive" className="text-lg">{highestAlert.severity.toUpperCase()}</Badge>
-                </p>
+                </div>
                  <div className="flex items-center gap-2 pt-2">
                     <ShieldCheck className="h-6 w-6 text-green-600" />
                     <span className="font-semibold text-green-700">Verified by AI & Disaster Management</span>
