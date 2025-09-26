@@ -2,32 +2,27 @@
 
 This is a Next.js project created in Firebase Studio. It's a comprehensive platform for crowdsourcing, visualizing, and analyzing ocean hazard information to protect coastal communities.
 
-## Project Summary
+## The INCOIS Problem Statement
 
-**SamudraSetu** is an AI-driven platform designed to bridge the gap in coastal safety by creating a unified intelligence loop. It addresses the problems of misinformation, slow reporting, and disconnected data by leveraging cutting-edge AI at every step.
+The Indian National Centre for Ocean Information Services (INCOIS) provides essential early warnings for ocean hazards but faces a critical gap: a lack of real-time, on-the-ground field reports from citizens. Furthermore, valuable insights from public discussions on social media during these events remain largely untapped. This creates a need for a unified platform to bridge this information gap, aggregate data, and provide a comprehensive operational picture for disaster management.
 
-### The Problem: A Disconnected & Reactive System
+## Our Solution: The SamudraSetu AI-Powered Intelligence Loop
 
-Current hazard reporting is chaotic and slow. It relies on a fragmented mix of:
-1.  **Public Panic:** Unverified social media posts that spread quickly, often containing misinformation and causing public confusion.
-2.  **Manual Reporting:** Formal reports from eyewitnesses that are slow to be filed and even slower to be verified by authorities.
-3.  **Official Channels:** Limited sensor data that may not capture localized, on-the-ground events in real-time.
+SamudraSetu is an AI-driven platform designed to directly address the INCOIS problem statement by creating a unified intelligence loop. It transforms a disconnected and reactive system into a streamlined, proactive one.
 
-This fragmented approach leads to critical delays, unreliable information, and an increased risk to coastal communities.
+### How SamudraSetu Addresses the Problem
 
-### Our Solution: The SamudraSetu AI-Powered Intelligence Loop
+*   **Problem: Lack of Real-time Field Reporting**
+    *   **Solution:** The **AI-Powered Reporting Form** allows any citizen with a smartphone to become a real-time sensor. By using AI to analyze an uploaded image and pre-fill the report, it makes submitting accurate, geotagged data faster and easier than ever, directly feeding the on-the-ground information that INCOIS needs.
 
-SamudraSetu transforms this chaotic process into a streamlined, four-stage intelligence loop:
+*   **Problem: Untapped Social Media Insights**
+    *   **Solution:** The **Social Intelligence Dashboard** is purpose-built for this. It uses a powerful AI (Google's Gemini) to continuously monitor and analyze public social media feeds, extracting key trends, public sentiment, and urgency levels related to coastal hazards.
 
-1.  **Report (AI-Assisted):** Citizens and on-ground volunteers act as real-time sensors. When a user uploads a photo of a hazard, our AI (using a **Google Gemini** model) instantly analyzes the image to pre-fill the report form with the identified hazard type, severity, and a detailed description. This makes reporting fast, accurate, and easy.
+*   **Problem: Fragmented Data & Lack of a Unified View**
+    *   **Solution:** The **Live Hazard Dashboard** serves as the single, unified platform. It aggregates both formal crowdsourced reports and social media activity onto one interactive map. With features like dynamic heatmaps and report clustering, it provides the comprehensive, at-a-glance operational picture required by disaster managers.
 
-2.  **Analyze (AI-Verified):** To combat misinformation, every report undergoes a dual-layer analysis.
-    *   An AI model (**BERT**, trained on fake news detection) scores the authenticity of the report's text to filter out hoaxes.
-    *   Another AI model (**Gemini**) analyzes public social media feeds to gauge public sentiment and identify emerging trends related to the hazard.
-
-3.  **Visualize (A Unified Dashboard):** All verified reports and social media insights are plotted on a single, live map. With features like heatmaps and marker clustering, it provides an immediate and intuitive operating picture for everyone from the public to disaster managers.
-
-4.  **Alert (Actionable Intelligence):** Disaster managers are equipped with a clear, real-time, and verified stream of intelligence. This allows them to move from reacting to chaos to making proactive, data-driven decisions about issuing alerts and deploying resources, ultimately saving lives and property.
+*   **Problem: Poor Situational Awareness for Emergency Agencies**
+    *   **Solution:** SamudraSetu provides direct, actionable intelligence. The AI-driven authenticity scoring filters out noise, while the analytics on report volume and social media urgency help agencies understand the **scale** and **urgency** of an event. Robust filtering allows officials to drill down by hazard type, location, and date to validate models and make faster, more informed decisions.
 
 ### Key Innovations
 
