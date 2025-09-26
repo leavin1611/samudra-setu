@@ -19,10 +19,9 @@ export function Header() {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/dashboard', label: 'Dashboard' },
+    { href: '/alerts', label: 'Alerts' },
     { href: '/social-intelligence', label: 'Social Intel' },
     { href: '/report', label: 'Report Hazard' },
-    { href: '#posts', label: 'Posts' },
-    { href: '#feeds', label: 'Feeds' },
   ];
 
   return (
