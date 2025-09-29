@@ -1,0 +1,65 @@
+
+[
+  {
+    "id": "iot_buoy_001",
+    "type": "Ocean Buoy",
+    "location": {
+      "lat": 13.0827,
+      "lng": 80.2707
+    },
+    "status": "online",
+    "lastReading": {
+      "waveHeight": "2.1m",
+      "waterTemp": "28.5°C"
+    }
+  },
+  {
+    "id": "iot_tide_gauge_002",
+    "type": "Tide Gauge",
+    "location": {
+      "lat": 9.9312,
+      "lng": 76.2673
+    },
+    "status": "online",
+    "lastReading": {
+      "waterLevel": "1.8m above normal"
+    }
+  },
+  {
+    "id": "iot_weather_station_003",
+    "type": "Coastal Weather Station",
+    "location": {
+      "lat": 12.9716,
+      "lng": 80.2319
+    },
+    "status": "offline",
+    "lastReading": {
+      "windSpeed": "15 km/h"
+    }
+  },
+  {
+    "id": "iot_buoy_004",
+    "type": "Ocean Buoy",
+    "location": {
+      "lat": 8.484,
+      "lng": 76.948
+    },
+    "status": "online",
+    "lastReading": {
+      "waveHeight": "1.5m",
+      "waterTemp": "29.1°C"
+    }
+  },
+  {
+    "id": "iot_tide_gauge_005",
+    "type": "Tide Gauge",
+    "location": {
+      "lat": 11.6234,
+      "lng": 79.7924
+    },
+    "status": "warning",
+    "lastReading": {
+      "waterLevel": "2.5m above normal"
+    }
+  }
+]

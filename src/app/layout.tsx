@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { HazardReportsProvider } from '@/context/HazardReportsContext';
 import { FirebaseClientProvider } from '@/firebase';
 import { NeedsProvider } from '@/context/NeedsContext';
+import { IoTDeviceProvider } from '@/context/IoTDeviceContext';
 
 export const metadata: Metadata = {
   title: 'SamudraSetu - Crowdsourced Ocean Hazard Reporting',
@@ -28,14 +29,16 @@ export default function RootLayout({
           <FirebaseClientProvider>
             <HazardReportsProvider>
               <NeedsProvider>
-                <div className="flex flex-col min-h-screen">
-                    <Header />
-                    <main className="flex-grow">
-                        {children}
-                    </main>
-                    <Footer />
-                </div>
-                <Toaster />
+                <IoTDeviceProvider>
+                  <div className="flex flex-col min-h-screen">
+                      <Header />
+                      <main className="flex-grow">
+                          {children}
+                      </main>
+                      <Footer />
+                  </div>
+                  <Toaster />
+                </IoTDeviceProvider>
               </NeedsProvider>
             </HazardReportsProvider>
           </FirebaseClientProvider>

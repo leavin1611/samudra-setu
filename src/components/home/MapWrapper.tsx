@@ -6,19 +6,51 @@ import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { HazardReport } from '@/lib/data';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
+import { useIoTDevices, IoTDevice } from '@/context/IoTDeviceContext';
+import { InfoWindow } from '@googlemaps/markerclusterer';
 
 type MapView = 'default' | 'heatmap' | 'cluster';
 
 export function MapWrapper({ reports }: { reports: HazardReport[] }) {
   const mapRef = useRef<HTMLDivElement>(null);
+  const { devices } = useIoTDevices();
   const mapInstance = useRef<google.maps.Map | null>(null);
   const heatmapLayer = useRef<google.maps.visualization.HeatmapLayer | null>(null);
   const markerClusterer = useRef<MarkerClusterer | null>(null);
   const markers = useRef<google.maps.Marker[]>([]);
+  const iotMarkers = useRef<google.maps.Marker[]>([]);
+  const openInfoWindow = useRef<google.maps.InfoWindow | null>(null);
   
   const [mapView, setMapView] = useState<MapView>('default');
 
   const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+  const createInfoWindow = (device: IoTDevice) => {
+    const statusColor = device.status === 'online' ? 'text-green-500' : device.status === 'offline' ? 'text-red-500' : 'text-yellow-500';
+    const readings = Object.entries(device.lastReading).map(([key, value]) => `
+      <div class="flex justify-between">
+        <span class="text-muted-foreground capitalize">${key.replace(/([A-Z])/g, ' $1')}:</span>
+        <span class="font-semibold">${value}</span>
+      </div>
+    `).join('');
+
+    const contentString = `
+      <div class="p-2 font-sans">
+        <h3 class="font-bold text-lg mb-2">${device.type}</h3>
+        <div class="text-sm space-y-1">
+          <div class="flex justify-between">
+            <span class="text-muted-foreground">Status:</span>
+            <span class="font-semibold ${statusColor} capitalize">${device.status}</span>
+          </div>
+          ${readings}
+        </div>
+      </div>
+    `;
+
+    return new google.maps.InfoWindow({
+      content: contentString,
+    });
+  }
 
   const clearMap = () => {
     if (heatmapLayer.current) {
@@ -29,6 +61,12 @@ export function MapWrapper({ reports }: { reports: HazardReport[] }) {
     }
     markers.current.forEach(marker => marker.setMap(null));
     markers.current = [];
+    iotMarkers.current.forEach(marker => marker.setMap(null));
+    iotMarkers.current = [];
+    if(openInfoWindow.current) {
+        openInfoWindow.current.close();
+        openInfoWindow.current = null;
+    }
   };
 
   const showDefaultView = () => {
@@ -41,6 +79,44 @@ export function MapWrapper({ reports }: { reports: HazardReport[] }) {
         title: report.title,
       })
     );
+     iotMarkers.current = devices.map(device => {
+      const getIcon = (status: string) => {
+        let color;
+        switch(status) {
+          case 'online': color = '#22c55e'; break;
+          case 'offline': color = '#ef4444'; break;
+          case 'warning': color = '#f59e0b'; break;
+          default: color = '#6b7280';
+        }
+        return {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: color,
+          fillOpacity: 1,
+          strokeColor: 'white',
+          strokeWeight: 2,
+        };
+      };
+
+      const marker = new window.google.maps.Marker({
+        position: device.location,
+        map: mapInstance.current!,
+        title: `${device.type} - ${device.id}`,
+        icon: getIcon(device.status)
+      });
+      
+      const infoWindow = createInfoWindow(device);
+
+      marker.addListener('click', () => {
+        if(openInfoWindow.current) {
+          openInfoWindow.current.close();
+        }
+        infoWindow.open(mapInstance.current, marker);
+        openInfoWindow.current = infoWindow;
+      });
+
+      return marker;
+    });
   };
 
   const showHeatmapView = () => {
@@ -139,11 +215,19 @@ export function MapWrapper({ reports }: { reports: HazardReport[] }) {
         showDefaultView();
         break;
     }
-  }, [mapView, reports, API_KEY]);
+  }, [mapView, reports, devices, API_KEY]);
 
   return (
       <Card className="w-full h-[600px] overflow-hidden shadow-lg relative">
         <div ref={mapRef} id="map" className="w-full h-full" />
+         <style jsx global>{`
+          .gm-style .gm-style-iw-c {
+            padding: 0 !important;
+          }
+          .gm-style .gm-style-iw-d {
+            overflow: hidden !important;
+          }
+        `}</style>
         <div className="absolute top-4 right-4 z-10">
              <Card className="p-3">
                 <div className="flex flex-col gap-2">
