@@ -87,6 +87,17 @@ This is the final, crucial step where intelligence drives action.
     *   **AI Integration (`generateSafetyPrecautions` flow):** Once such an alert is identified, its `hazardType` and `severity` are sent to this new Genkit flow. This flow uses **Gemini** to generate a practical, easy-to-understand list of **"Do's and Don'ts"** and a concise public safety bulletin.
     *   **Display:** The resulting alert—containing the location, hazard type, and clear safety instructions—is prominently displayed at the top of the homepage, ensuring it's the first thing visitors see.
 
+### 4. Future Vision: IoT Integration
+
+To further enhance its proactive capabilities, SamudraSetu is designed for future integration with a network of coastal **Internet of Things (IoT) sensors**.
+
+*   **Concept:** Low-cost devices like **water level sensors**, **weather stations**, and **buoys** could be deployed along the coastline. These devices would transmit real-time data (e.g., tide height, wind speed, wave patterns) to a cloud backend.
+*   **Workflow:**
+    1.  IoT devices send data to a cloud endpoint (e.g., Google Cloud IoT Core).
+    2.  A backend service (e.g., a Firebase Function) processes this data, formats it like a standard hazard report, and saves it to Firestore.
+    3.  The data appears on the SamudraSetu dashboard with a unique icon to distinguish it from citizen reports.
+*   **Benefit:** This creates a fully automated, 24/7 monitoring system. The platform can then trigger alerts based on sensor thresholds (e.g., multiple sensors reporting a rapid water level rise), enabling even earlier warnings and a more comprehensive view of coastal conditions.
+
 
 ## Getting Started Locally
 
