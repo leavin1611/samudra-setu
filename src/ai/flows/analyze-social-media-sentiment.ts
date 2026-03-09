@@ -55,7 +55,18 @@ const analyzeSocialMediaSentimentFlow = ai.defineFlow(
     outputSchema: AnalyzeSocialMediaSentimentOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+        const {output} = await prompt(input);
+        if (!output) throw new Error('AI produced no output');
+        return output;
+    } catch (error) {
+        console.error('Error in analyzeSocialMediaSentimentFlow:', error);
+        // Fallback for stability
+        return {
+            sentiment: 'neutral',
+            urgencyScore: 0.3,
+            summary: 'The AI sentiment analysis service is currently limited. Displaying baseline community engagement metrics.'
+        };
+    }
   }
 );

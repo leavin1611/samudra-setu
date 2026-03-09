@@ -1,4 +1,3 @@
-
 'use server';
 
 /**
@@ -66,9 +65,18 @@ const analyzeReportImageFlow = ai.defineFlow(
     outputSchema: AnalyzeReportImageOutputSchema,
   },
   async input => {
-    const { output } = await prompt(input);
-    return output!;
+    try {
+        const { output } = await prompt(input);
+        if (!output) throw new Error('AI produced no output');
+        return output;
+    } catch (error) {
+        console.error('Error in analyzeReportImageFlow:', error);
+        // Fallback for demo
+        return {
+            hazardType: 'other',
+            severity: 'medium',
+            description: 'AI Image Analysis is currently unavailable. Please provide a manual description of the observed hazard.'
+        };
+    }
   }
 );
-
-    

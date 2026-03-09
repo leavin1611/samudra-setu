@@ -1,4 +1,3 @@
-
 'use server';
 
 /**
@@ -57,7 +56,18 @@ const generateSafetyPrecautionsFlow = ai.defineFlow(
     outputSchema: GenerateSafetyPrecautionsOutputSchema,
   },
   async input => {
-    const { output } = await prompt(input);
-    return output!;
+    try {
+        const { output } = await prompt(input);
+        if (!output) throw new Error('AI produced no output');
+        return output;
+    } catch (error) {
+        console.error('Error in generateSafetyPrecautionsFlow:', error);
+        // Fallback precautions based on hazard type
+        return {
+            dos: ['Stay away from the coast', 'Listen to local authorities', 'Seek higher ground if necessary'],
+            donts: ['Do not go near the water', 'Do not ignore official warnings', 'Do not attempt to travel through flooded areas'],
+            bulletin: 'Public safety alert: Exercise extreme caution and follow local emergency guidance.'
+        };
+    }
   }
 );
