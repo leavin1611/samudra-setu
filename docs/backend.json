@@ -4,359 +4,743 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a user of the OceanGuard platform.",
+      "description": "Represents a base user account in the OceanGuard platform, irrespective of their specific role. This entity contains common authentication-related details (excluding sensitive credentials handled by an external auth system) and general user information.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the user."
-        },
-        "userType": {
-          "type": "string",
-          "description": "Type of user (citizen, coastal resident, volunteer, disaster manager)."
-        },
-        "username": {
-          "type": "string",
-          "description": "Username for login."
-        },
-        "name": {
-          "type": "string",
-          "description": "Full name of the user."
+          "description": "Unique identifier for the User entity."
         },
         "email": {
           "type": "string",
-          "description": "Email address of the user.",
+          "description": "The user's email address, used for identification and communication.",
           "format": "email"
+        },
+        "username": {
+          "type": "string",
+          "description": "A unique username chosen by the user for identification within the platform."
+        },
+        "userType": {
+          "type": "string",
+          "description": "The type of user, indicating their role and linked profile details (e.g., 'Citizen', 'CoastalResident', 'Volunteer', 'DisasterManager')."
+        },
+        "accountStatus": {
+          "type": "string",
+          "description": "The current status of the user's account (e.g., 'active', 'pending_verification', 'suspended')."
+        },
+        "registrationDateTime": {
+          "type": "string",
+          "description": "The date and time when the user registered for the platform.",
+          "format": "date-time"
+        },
+        "lastLoginDateTime": {
+          "type": "string",
+          "description": "The date and time of the user's last login.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "username",
+        "userType",
+        "accountStatus",
+        "registrationDateTime"
+      ]
+    },
+    "CitizenProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CitizenProfile",
+      "type": "object",
+      "description": "Stores specific profile information for users identified as 'Citizens', who primarily report hazards and receive alerts.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the CitizenProfile entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User entity. (Relationship: User 1:1 CitizenProfile)"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "The full name of the citizen."
         },
         "mobileNumber": {
           "type": "string",
-          "description": "Mobile number of the user."
+          "description": "The citizen's mobile contact number."
         },
-        "location": {
+        "locationDescription": {
           "type": "string",
-          "description": "Location of the user (city/town/village)."
+          "description": "A descriptive string of the citizen's primary location (City/Town/Village)."
+        },
+        "areaType": {
+          "type": "string",
+          "description": "The type of area the citizen resides in ('coastal' or 'inland')."
         },
         "preferredLanguage": {
           "type": "string",
-          "description": "Preferred language of the user."
+          "description": "The citizen's preferred language for platform interactions and alerts."
         },
         "profilePictureUrl": {
           "type": "string",
-          "description": "URL of the user's profile picture."
+          "description": "URL to the citizen's optional profile picture.",
+          "format": "uri"
         },
-        "emergencyContact": {
+        "emergencyContactNumber": {
           "type": "string",
-          "description": "Emergency contact number of the user."
+          "description": "An optional emergency contact number for the citizen."
         },
-        "alertPreferences": {
+        "alertPreferenceHazardTypeIds": {
           "type": "array",
-          "description": "Array of alert preferences (tsunami, high tide, marine debris, flooding).",
+          "description": "References to HazardType entities, indicating which types of hazard alerts the citizen prefers to receive. (Relationship: HazardType N:N CitizenProfile)",
           "items": {
             "type": "string"
           }
         },
-        "address": {
+        "twoFactorAuthEnabled": {
+          "type": "boolean",
+          "description": "Indicates if two-factor authentication is enabled for the citizen's account."
+        },
+        "termsAgreed": {
+          "type": "boolean",
+          "description": "Indicates if the citizen has agreed to the Terms of Service and Privacy Policy."
+        },
+        "dataConsentGiven": {
+          "type": "boolean",
+          "description": "Indicates if the citizen has given consent for their anonymized data to be used for research and analytics."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "fullName",
+        "mobileNumber",
+        "locationDescription",
+        "areaType",
+        "preferredLanguage",
+        "twoFactorAuthEnabled",
+        "termsAgreed",
+        "dataConsentGiven"
+      ]
+    },
+    "CoastalResidentProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CoastalResidentProfile",
+      "type": "object",
+      "description": "Stores specific profile information for users identified as 'Coastal Residents', who are frequent observers near the coast.",
+      "properties": {
+        "id": {
           "type": "string",
-          "description": "Permanent address of the coastal resident."
+          "description": "Unique identifier for the CoastalResidentProfile entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User entity. (Relationship: User 1:1 CoastalResidentProfile)"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "The full name of the coastal resident."
+        },
+        "permanentAddress": {
+          "type": "string",
+          "description": "The complete permanent address of the coastal resident, including pincode."
         },
         "nearestCoastalLandmark": {
           "type": "string",
-          "description": "Nearest coastal landmark for the coastal resident."
+          "description": "A prominent coastal landmark near the resident's location (e.g., 'Marina Beach')."
+        },
+        "mobileNumber": {
+          "type": "string",
+          "description": "The coastal resident's mobile contact number."
+        },
+        "isWhatsappVerified": {
+          "type": "boolean",
+          "description": "Indicates if the resident uses WhatsApp on their registered number for faster verification."
+        },
+        "geolocationAccessAllowed": {
+          "type": "boolean",
+          "description": "Indicates if the resident allows geolocation access for precise hazard reports."
         },
         "frequencyAtCoastalArea": {
           "type": "string",
-          "description": "Frequency of visits to the coastal area by the coastal resident."
+          "description": "How often the resident is present at a coastal area ('daily', 'weekly', 'monthly', 'seasonal')."
         },
         "knowledgeLevel": {
           "type": "string",
-          "description": "Knowledge level about ocean hazards of the coastal resident."
+          "description": "The resident's knowledge level regarding coastal conditions and ocean hazards ('basic', 'experienced', 'fisherfolk', 'trained')."
+        },
+        "willingToParticipateInFollowUp": {
+          "type": "boolean",
+          "description": "Indicates if the resident is willing to participate in follow-up surveys or validation processes."
+        },
+        "twoFactorAuthEnabled": {
+          "type": "boolean",
+          "description": "Indicates if two-factor authentication is enabled for the resident's account."
+        },
+        "termsAgreed": {
+          "type": "boolean",
+          "description": "Indicates if the resident has agreed to the Terms of Service and Privacy Policy."
+        },
+        "dataConsentGiven": {
+          "type": "boolean",
+          "description": "Indicates if the resident has given consent for their anonymized data to be used for research and analytics."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "fullName",
+        "permanentAddress",
+        "nearestCoastalLandmark",
+        "mobileNumber",
+        "frequencyAtCoastalArea",
+        "knowledgeLevel",
+        "twoFactorAuthEnabled",
+        "termsAgreed",
+        "dataConsentGiven"
+      ]
+    },
+    "VolunteerProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "VolunteerProfile",
+      "type": "object",
+      "description": "Stores specific profile information for users identified as 'Volunteers', who are active contributors and helpers in hazard response.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the VolunteerProfile entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User entity. (Relationship: User 1:1 VolunteerProfile)"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "The full name of the volunteer."
+        },
+        "mobileNumber": {
+          "type": "string",
+          "description": "The volunteer's mobile contact number."
         },
         "currentCity": {
           "type": "string",
-          "description": "Current city of the volunteer."
+          "description": "The volunteer's current city of residence."
         },
-        "coastalRegion": {
+        "usualCoastalRegion": {
           "type": "string",
-          "description": "Usual coastal region of the volunteer."
+          "description": "The coastal region where the volunteer typically operates ('east', 'west', 'south', 'islands')."
         },
-        "skills": {
+        "skillsExpertise": {
           "type": "array",
-          "description": "Array of skills/expertise of the volunteer.",
+          "description": "A list of skills or areas of expertise the volunteer possesses (e.g., 'First Aid', 'Water Rescue', 'GIS Mapping').",
           "items": {
             "type": "string"
           }
         },
         "availability": {
           "type": "string",
-          "description": "Availability of the volunteer."
+          "description": "The volunteer's general availability for tasks ('weekdays', 'weekends', 'on_call', 'flexible')."
         },
         "affiliation": {
           "type": "string",
-          "description": "Affiliation of the volunteer (if any)."
+          "description": "Optional affiliation of the volunteer (e.g., 'NGO', 'community group')."
         },
         "emergencyEquipmentAccess": {
           "type": "array",
-          "description": "Array of emergency equipment accessible by the volunteer (boats, drones, first-aid kits, communication equipment).",
+          "description": "A list of emergency equipment the volunteer has access to (e.g., 'Boats', 'Drones', 'First-aid kits').",
           "items": {
             "type": "string"
           }
         },
+        "consentToContactDuringEmergencies": {
+          "type": "boolean",
+          "description": "Indicates if the volunteer consents to be contacted by disaster managers during emergencies."
+        },
+        "twoFactorAuthEnabled": {
+          "type": "boolean",
+          "description": "Indicates if two-factor authentication is enabled for the volunteer's account."
+        },
+        "termsAgreed": {
+          "type": "boolean",
+          "description": "Indicates if the volunteer has agreed to the Terms of Service and Privacy Policy."
+        },
+        "dataConsentGiven": {
+          "type": "boolean",
+          "description": "Indicates if the volunteer has given consent for their anonymized data to be used for research and analytics."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "fullName",
+        "mobileNumber",
+        "currentCity",
+        "usualCoastalRegion",
+        "skillsExpertise",
+        "availability",
+        "consentToContactDuringEmergencies",
+        "twoFactorAuthEnabled",
+        "termsAgreed",
+        "dataConsentGiven"
+      ]
+    },
+    "DisasterManagerProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "DisasterManagerProfile",
+      "type": "object",
+      "description": "Stores specific profile information for users identified as 'Disaster Managers', who are official/authorized personnel.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the DisasterManagerProfile entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User entity. (Relationship: User 1:1 DisasterManagerProfile)"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "The full name of the disaster manager."
+        },
         "officialEmail": {
           "type": "string",
-          "description": "Official email of the disaster manager.",
+          "description": "The disaster manager's official email address.",
           "format": "email"
         },
-        "officialPhone": {
+        "officialPhoneNumber": {
           "type": "string",
-          "description": "Official phone number of the disaster manager."
+          "description": "The disaster manager's official phone number."
         },
-        "organization": {
+        "organizationDepartment": {
           "type": "string",
-          "description": "Organization/Department of the disaster manager."
+          "description": "The organization or department the disaster manager belongs to (e.g., 'INCOIS')."
         },
         "designation": {
           "type": "string",
-          "description": "Designation of the disaster manager."
+          "description": "The official designation of the disaster manager."
         },
-        "officialId": {
+        "officialIdNumber": {
           "type": "string",
-          "description": "Official ID number of the disaster manager."
+          "description": "The official identification number of the disaster manager."
         },
         "idProofDocumentUrl": {
           "type": "string",
-          "description": "URL of the ID proof document of the disaster manager."
+          "description": "URL to the uploaded official ID proof document for verification.",
+          "format": "uri"
         },
-        "responsibilityRegions": {
+        "regionsOfResponsibility": {
           "type": "array",
-          "description": "Array of regions of responsibility for the disaster manager.",
+          "description": "A list of coastal regions for which the disaster manager is responsible (e.g., 'Tamil Nadu', 'Odisha').",
           "items": {
             "type": "string"
           }
         },
         "accessLevel": {
           "type": "string",
-          "description": "Access level of the disaster manager."
+          "description": "The level of access the disaster manager has on the platform ('read_only', 'approve_reports', 'send_alerts', 'admin')."
         },
         "preferredDataFormats": {
           "type": "array",
-          "description": "Array of preferred data formats for the disaster manager (CSV, GeoJSON, API access).",
+          "description": "A list of preferred data formats for reports and analytics (e.g., 'CSV', 'GeoJSON', 'API Access').",
           "items": {
             "type": "string"
           }
-        }
-      },
-      "required": [
-        "id",
-        "userType",
-        "username",
-        "name",
-        "email",
-        "mobileNumber",
-        "location",
-        "preferredLanguage"
-      ]
-    },
-    "AadharVerification": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "AadharVerification",
-      "type": "object",
-      "description": "Stores verification requests when using Aadhar to authenticate.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the verification request."
         },
-        "userId": {
-          "type": "string",
-          "description": "Reference to User. (Relationship: User 1:1 AadharVerification)"
-        },
-        "mobileNumber": {
-          "type": "string",
-          "description": "Mobile number used for verification."
-        },
-        "otp": {
-          "type": "string",
-          "description": "One-Time Password sent to the mobile number."
-        },
-        "otpExpiration": {
-          "type": "string",
-          "description": "Date and time when the OTP expires.",
-          "format": "date-time"
-        },
-        "isVerified": {
+        "consentForSocialMediaIntegration": {
           "type": "boolean",
-          "description": "Indicates whether the mobile number has been verified."
+          "description": "Indicates if the disaster manager consents to integration with social media monitoring tools."
         },
-        "requestTime": {
-          "type": "string",
-          "description": "Date and time when the OTP request was made.",
-          "format": "date-time"
+        "twoFactorAuthEnabled": {
+          "type": "boolean",
+          "description": "Indicates if two-factor authentication is enabled for the disaster manager's account."
+        },
+        "termsAgreed": {
+          "type": "boolean",
+          "description": "Indicates if the disaster manager has agreed to the Terms of Service and Privacy Policy."
+        },
+        "dataConsentGiven": {
+          "type": "boolean",
+          "description": "Indicates if the disaster manager has given consent for their anonymized data to be used for research and analytics."
         }
       },
       "required": [
         "id",
         "userId",
-        "mobileNumber",
-        "otp",
-        "otpExpiration",
-        "isVerified",
-        "requestTime"
+        "fullName",
+        "officialEmail",
+        "officialPhoneNumber",
+        "organizationDepartment",
+        "designation",
+        "officialIdNumber",
+        "idProofDocumentUrl",
+        "regionsOfResponsibility",
+        "accessLevel",
+        "preferredDataFormats",
+        "consentForSocialMediaIntegration",
+        "twoFactorAuthEnabled",
+        "termsAgreed",
+        "dataConsentGiven"
       ]
     },
     "HazardReport": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "HazardReport",
       "type": "object",
-      "description": "Represents a hazard report submitted by a user.",
+      "description": "Represents a report of an observed ocean hazard submitted by a user.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the hazard report."
+          "description": "Unique identifier for the HazardReport entity."
         },
-        "userId": {
+        "reporterId": {
           "type": "string",
-          "description": "Reference to User. (Relationship: User 1:N HazardReport)"
+          "description": "Reference to the User who submitted this report. (Relationship: User 1:N HazardReport)"
         },
-        "hazardType": {
+        "hazardTypeId": {
           "type": "string",
-          "description": "Type of hazard (tsunami, storm surge, high waves, etc.)."
+          "description": "Reference to the type of hazard being reported. (Relationship: HazardType 1:N HazardReport)"
         },
         "severityLevel": {
           "type": "string",
-          "description": "Severity level of the hazard (low, medium, high, extreme)."
+          "description": "The severity level of the reported hazard ('low', 'medium', 'high', 'extreme')."
         },
-        "location": {
+        "locationDescription": {
           "type": "string",
-          "description": "Location of the hazard."
+          "description": "A textual description of the hazard's location as provided by the reporter."
         },
         "latitude": {
           "type": "number",
-          "description": "Latitude of the hazard location."
+          "description": "The geographical latitude of the hazard's location."
         },
         "longitude": {
           "type": "number",
-          "description": "Longitude of the hazard location."
+          "description": "The geographical longitude of the hazard's location."
         },
-        "reportDate": {
+        "reportDateTime": {
           "type": "string",
-          "description": "Date of the hazard report.",
+          "description": "The date and time when the hazard was observed.",
           "format": "date-time"
         },
         "description": {
           "type": "string",
-          "description": "Description of the hazard."
+          "description": "Detailed description of the observed hazard."
         },
-        "mediaUrls": {
-          "type": "array",
-          "description": "Array of URLs for media (photos, videos) associated with the report.",
-          "items": {
-            "type": "string"
-          }
+        "status": {
+          "type": "string",
+          "description": "The current status of the report ('pending', 'under_review', 'verified', 'false_report', 'resolved')."
         },
         "isVerified": {
           "type": "boolean",
-          "description": "Indicates whether the report has been verified by a disaster manager."
+          "description": "Indicates if the report has been officially verified."
         },
-        "verificationNotes": {
+        "verifierId": {
           "type": "string",
-          "description": "Notes from disaster managers during verification process."
+          "description": "Reference to the User (likely a DisasterManager) who verified the report. (Relationship: User 1:N HazardReport)"
+        },
+        "verificationDateTime": {
+          "type": "string",
+          "description": "The date and time when the report was verified.",
+          "format": "date-time"
+        },
+        "submissionDateTime": {
+          "type": "string",
+          "description": "The date and time when the report was submitted to the platform.",
+          "format": "date-time"
+        },
+        "confirmationConsent": {
+          "type": "boolean",
+          "description": "Indicates if the reporter confirmed the report is based on direct observation."
+        },
+        "hazardTagIds": {
+          "type": "array",
+          "description": "References to HazardTag entities associated with this report. (Relationship: HazardTag N:N HazardReport)",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
         "id",
-        "userId",
-        "hazardType",
+        "reporterId",
+        "hazardTypeId",
         "severityLevel",
-        "location",
-        "reportDate",
+        "locationDescription",
+        "latitude",
+        "longitude",
+        "reportDateTime",
+        "description",
+        "status",
+        "isVerified",
+        "submissionDateTime",
+        "confirmationConsent"
+      ]
+    },
+    "MediaAttachment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MediaAttachment",
+      "type": "object",
+      "description": "Represents a photo or video attached to a hazard report.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MediaAttachment entity."
+        },
+        "hazardReportId": {
+          "type": "string",
+          "description": "Reference to the HazardReport this media is attached to. (Relationship: HazardReport 1:N MediaAttachment)"
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL where the media file is stored.",
+          "format": "uri"
+        },
+        "mediaType": {
+          "type": "string",
+          "description": "The type of media ('image' or 'video')."
+        },
+        "uploadDateTime": {
+          "type": "string",
+          "description": "The date and time when the media was uploaded.",
+          "format": "date-time"
+        },
+        "fileSizeKB": {
+          "type": "number",
+          "description": "The size of the media file in kilobytes."
+        },
+        "caption": {
+          "type": "string",
+          "description": "An optional caption for the media attachment."
+        }
+      },
+      "required": [
+        "id",
+        "hazardReportId",
+        "url",
+        "mediaType",
+        "uploadDateTime",
+        "fileSizeKB"
+      ]
+    },
+    "HazardType": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "HazardType",
+      "type": "object",
+      "description": "A lookup entity for predefined types of ocean hazards.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the HazardType entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the hazard type (e.g., 'Tsunami', 'High Waves')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the hazard type."
+        }
+      },
+      "required": [
+        "id",
+        "name",
         "description"
+      ]
+    },
+    "HazardTag": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "HazardTag",
+      "type": "object",
+      "description": "A flexible entity for categorizing and linking reports with relevant keywords or concepts.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the HazardTag entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the tag (e.g., 'Chennai', 'Marine Debris')."
+        },
+        "description": {
+          "type": "string",
+          "description": "An optional description for the tag."
+        }
+      },
+      "required": [
+        "id",
+        "name"
       ]
     },
     "SocialMediaPost": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "SocialMediaPost",
       "type": "object",
-      "description": "Represents a social media post related to ocean hazards.",
+      "description": "Represents a post scraped and analyzed from social media feeds that is potentially related to ocean hazards.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the social media post."
+          "description": "Unique identifier for the SocialMediaPost entity."
         },
-        "platform": {
+        "sourcePlatform": {
           "type": "string",
-          "description": "Platform where the post was made (Twitter, Facebook, YouTube, etc.)."
-        },
-        "postId": {
-          "type": "string",
-          "description": "Identifier of the post on the social media platform."
+          "description": "The social media platform where the post originated (e.g., 'Twitter', 'Facebook', 'YouTube')."
         },
         "postUrl": {
           "type": "string",
-          "description": "URL of the social media post.",
+          "description": "The URL to the original social media post.",
           "format": "uri"
+        },
+        "authorHandle": {
+          "type": "string",
+          "description": "The username or handle of the author of the social media post."
         },
         "content": {
           "type": "string",
-          "description": "Content of the social media post."
+          "description": "The full text content of the social media post."
         },
-        "author": {
-          "type": "string",
-          "description": "Author of the social media post."
+        "hashtags": {
+          "type": "array",
+          "description": "A list of hashtags included in the post.",
+          "items": {
+            "type": "string"
+          }
         },
-        "postDate": {
+        "likesCount": {
+          "type": "number",
+          "description": "The number of likes or reactions the post received."
+        },
+        "commentsCount": {
+          "type": "number",
+          "description": "The number of comments on the post."
+        },
+        "repostsCount": {
+          "type": "number",
+          "description": "The number of times the post was shared or reposted (if applicable)."
+        },
+        "sentimentScore": {
+          "type": "number",
+          "description": "A numerical score indicating the sentiment of the post (e.g., -1.0 for negative to 1.0 for positive)."
+        },
+        "sentimentCategory": {
           "type": "string",
-          "description": "Date and time the post was created.",
+          "description": "Categorization of the post's sentiment ('positive', 'neutral', 'negative')."
+        },
+        "extractedKeywords": {
+          "type": "array",
+          "description": "Keywords extracted from the post content by NLP for hazard-related discussions.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "locationDescription": {
+          "type": "string",
+          "description": "A textual description of the location mentioned or geo-tagged in the post."
+        },
+        "latitude": {
+          "type": "number",
+          "description": "The geographical latitude derived from the post, if available."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "The geographical longitude derived from the post, if available."
+        },
+        "postDateTime": {
+          "type": "string",
+          "description": "The date and time when the social media post was published.",
           "format": "date-time"
         },
-        "location": {
-          "type": "string",
-          "description": "Location mentioned in the social media post (if any)."
-        },
-        "hazardType": {
-          "type": "string",
-          "description": "Type of hazard mentioned in the social media post (if any)."
-        },
-        "sentiment": {
-          "type": "string",
-          "description": "Sentiment of the social media post (positive, negative, neutral)."
-        },
-        "engagementMetrics": {
-          "type": "string",
-          "description": "Engagement metrics for the post (likes, shares, comments)."
+        "relatedHazardReportIds": {
+          "type": "array",
+          "description": "References to HazardReport entities if this social media post is confirmed to be related to a specific report. (Relationship: HazardReport N:N SocialMediaPost)",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
         "id",
-        "platform",
-        "postId",
+        "sourcePlatform",
+        "postUrl",
+        "authorHandle",
         "content",
-        "author",
-        "postDate"
+        "postDateTime"
       ]
     },
-    "NeedRequest": {
-        "$schema": "http://json-schema.org/draft-07/schema#",
-        "title": "NeedRequest",
-        "type": "object",
-        "description": "Represents a request for assistance from a user during a hazard.",
-        "properties": {
-            "id": { "type": "string", "description": "Unique ID for the request." },
-            "userId": { "type": "string", "description": "ID of the user making the request." },
-            "hazardReportId": { "type": "string", "description": "Optional ID of a related hazard report." },
-            "needType": { "type": "string", "description": "Type of need (e.g., Water, Food, Medical, Shelter, Rescue)." },
-            "location": { "type": "string", "description": "Location of the person in need." },
-            "description": { "type": "string", "description": "Detailed description of the situation and need." },
-            "isUrgent": { "type": "boolean", "description": "Whether the request is marked as urgent." },
-            "requestDate": { "type": "string", "format": "date-time", "description": "When the request was submitted." },
-            "status": { "type": "string", "description": "Current status (Open, In-Progress, Fulfilled)." }
+    "Alert": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Alert",
+      "type": "object",
+      "description": "Represents a system-generated or manually issued alert about an ocean hazard, intended for communication to users.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Alert entity."
         },
-        "required": ["id", "userId", "needType", "location", "description", "requestDate", "status"]
+        "alertType": {
+          "type": "string",
+          "description": "The category of the alert (e.g., 'Tsunami Warning', 'Flooding Alert', 'High Wave Advisory', 'General Information')."
+        },
+        "hazardReportId": {
+          "type": "string",
+          "description": "Reference to the HazardReport that triggered or is associated with this alert, if applicable. (Relationship: HazardReport 1:N Alert)"
+        },
+        "issuedByUserId": {
+          "type": "string",
+          "description": "Reference to the User (e.g., DisasterManager or system) who issued the alert. (Relationship: User 1:N Alert)"
+        },
+        "message": {
+          "type": "string",
+          "description": "The detailed message content of the alert."
+        },
+        "severityLevel": {
+          "type": "string",
+          "description": "The severity level of the alert ('low', 'medium', 'high', 'extreme')."
+        },
+        "targetRegionDescription": {
+          "type": "string",
+          "description": "A textual description of the affected geographical area."
+        },
+        "targetGeoJson": {
+          "type": "string",
+          "description": "Optional GeoJSON data representing the precise geographical area targeted by the alert."
+        },
+        "issuedDateTime": {
+          "type": "string",
+          "description": "The date and time when the alert was issued.",
+          "format": "date-time"
+        },
+        "expiresDateTime": {
+          "type": "string",
+          "description": "The date and time when the alert is set to expire.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the alert ('active', 'cancelled', 'resolved')."
+        },
+        "relatedSocialMediaPostIds": {
+          "type": "array",
+          "description": "References to SocialMediaPost entities that informed this alert. (Relationship: SocialMediaPost N:N Alert)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "alertType",
+        "issuedByUserId",
+        "message",
+        "severityLevel",
+        "targetRegionDescription",
+        "issuedDateTime",
+        "status"
+      ]
     }
   },
   "auth": {
     "providers": [
       "password",
-      "anonymous",
-      "phone"
+      "anonymous"
     ]
   },
   "firestore": {
@@ -368,88 +752,140 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Stores user profile information. Uses path-based ownership for access control.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            }
-          ]
+          "description": "Stores core user authentication and general information. The document ID `{userId}` corresponds to `request.auth.uid`. Includes `userType` to indicate which specific profile type exists for this user."
         }
       },
       {
-        "path": "/users/{userId}/aadharVerifications/{verificationId}",
+        "path": "/citizenProfiles/{userId}",
         "definition": {
-          "entityName": "AadharVerification",
+          "entityName": "CitizenProfile",
           "schema": {
-            "$ref": "#/backend/entities/AadharVerification"
+            "$ref": "#/backend/entities/CitizenProfile"
           },
-          "description": "Stores Aadhar verification requests for users. Organized as a subcollection of users for localized access and secure creation.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            },
-            {
-              "name": "verificationId",
-              "description": "The unique identifier for the Aadhar verification request."
-            }
-          ]
+          "description": "Stores specific profile details for users with `userType: 'Citizen'`. The document ID `{userId}` matches the corresponding user's ID. Access is restricted to the owner (`userId`). Includes denormalized `userId` for authorization independence."
         }
       },
       {
-        "path": "/users/{userId}/hazardReports/{hazardReportId}",
+        "path": "/coastalResidentProfiles/{userId}",
+        "definition": {
+          "entityName": "CoastalResidentProfile",
+          "schema": {
+            "$ref": "#/backend/entities/CoastalResidentProfile"
+          },
+          "description": "Stores specific profile details for users with `userType: 'CoastalResident'`. The document ID `{userId}` matches the corresponding user's ID. Access is restricted to the owner (`userId`). Includes denormalized `userId` for authorization independence."
+        }
+      },
+      {
+        "path": "/volunteerProfiles/{userId}",
+        "definition": {
+          "entityName": "VolunteerProfile",
+          "schema": {
+            "$ref": "#/backend/entities/VolunteerProfile"
+          },
+          "description": "Stores specific profile details for users with `userType: 'Volunteer'`. The document ID `{userId}` matches the corresponding user's ID. Access is restricted to the owner (`userId`). Includes denormalized `userId` for authorization independence."
+        }
+      },
+      {
+        "path": "/disasterManagerProfiles/{userId}",
+        "definition": {
+          "entityName": "DisasterManagerProfile",
+          "schema": {
+            "$ref": "#/backend/entities/DisasterManagerProfile"
+          },
+          "description": "Stores specific profile details for users with `userType: 'DisasterManager'`. The document ID `{userId}` matches the corresponding user's ID. Access is restricted to the owner (`userId`) and potentially other `adminUsers`. The `accessLevel` field within this document will dictate granular permissions across the platform. Includes denormalized `userId` for authorization independence."
+        }
+      },
+      {
+        "path": "/hazardReports_pending/{reportId}",
         "definition": {
           "entityName": "HazardReport",
           "schema": {
             "$ref": "#/backend/entities/HazardReport"
           },
-          "description": "Stores hazard reports submitted by users. Organized as a subcollection of users for localized access and secure creation.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            },
-            {
-              "name": "hazardReportId",
-              "description": "The unique identifier for the hazard report."
-            }
-          ]
+          "description": "Stores HazardReport documents with `status` such as 'pending', 'under_review', or 'false_report'. These reports are visible to the `reporterId` and `disasterManagerProfiles` for review and action. This collection ensures segregation of non-public reports. Includes denormalized `reporterId` for authorization independence."
         }
       },
       {
-        "path": "/socialMediaPosts/{socialMediaPostId}",
+        "path": "/hazardReports_pending/{reportId}/mediaAttachments/{attachmentId}",
+        "definition": {
+          "entityName": "MediaAttachment",
+          "schema": {
+            "$ref": "#/backend/entities/MediaAttachment"
+          },
+          "description": "Stores MediaAttachment documents associated with pending or under-review hazard reports. Access mirrors the parent report: visible to `reporterId` and `disasterManagerProfiles`. Includes denormalized `reporterId` for authorization independence."
+        }
+      },
+      {
+        "path": "/hazardReports_public/{reportId}",
+        "definition": {
+          "entityName": "HazardReport",
+          "schema": {
+            "$ref": "#/backend/entities/HazardReport"
+          },
+          "description": "Stores HazardReport documents with `status: 'verified'`. These reports are publicly readable, allowing for efficient dashboard and map visualization queries without rules acting as filters (QAP-compliant). Includes denormalized `reporterId` for authorization independence."
+        }
+      },
+      {
+        "path": "/hazardReports_public/{reportId}/mediaAttachments/{attachmentId}",
+        "definition": {
+          "entityName": "MediaAttachment",
+          "schema": {
+            "$ref": "#/backend/entities/MediaAttachment"
+          },
+          "description": "Stores MediaAttachment documents associated with public, verified hazard reports. This collection is publicly readable. Includes denormalized `reporterId` for authorization independence."
+        }
+      },
+      {
+        "path": "/hazardTypes/{hazardTypeId}",
+        "definition": {
+          "entityName": "HazardType",
+          "schema": {
+            "$ref": "#/backend/entities/HazardType"
+          },
+          "description": "Lookup collection for predefined hazard types. Globally readable; write access restricted to `adminUsers`."
+        }
+      },
+      {
+        "path": "/hazardTags/{hazardTagId}",
+        "definition": {
+          "entityName": "HazardTag",
+          "schema": {
+            "$ref": "#/backend/entities/HazardTag"
+          },
+          "description": "Lookup collection for flexible hazard tags. Globally readable; write access restricted to `adminUsers`."
+        }
+      },
+      {
+        "path": "/socialMediaPosts/{postId}",
         "definition": {
           "entityName": "SocialMediaPost",
           "schema": {
             "$ref": "#/backend/entities/SocialMediaPost"
           },
-          "description": "Stores social media posts related to ocean hazards. Segregation supports QAPs and simplified security rules.",
-          "params": [
-            {
-              "name": "socialMediaPostId",
-              "description": "The unique identifier for the social media post."
-            }
-          ]
+          "description": "Stores social media posts scraped and analyzed for hazard-related content. Publicly readable; write access restricted to the backend NLP service or `adminUsers`."
         }
       },
       {
-        "path": "/needRequests/{needRequestId}",
+        "path": "/alerts/{alertId}",
         "definition": {
-          "entityName": "NeedRequest",
+          "entityName": "Alert",
           "schema": {
-            "$ref": "#/backend/entities/NeedRequest"
+            "$ref": "#/backend/entities/Alert"
           },
-          "description": "Stores requests for assistance from users in affected areas. Kept in a separate collection for easy querying by volunteers and managers.",
-          "params": [
-            {
-              "name": "needRequestId",
-              "description": "The unique identifier for the need request."
-            }
-          ]
+          "description": "Stores system-generated or manually issued alerts. Publicly readable for all users; write access restricted to `disasterManagerProfiles` with appropriate `accessLevel` or `adminUsers`. Includes denormalized `issuedByUserId` for authorization independence."
+        }
+      },
+      {
+        "path": "/appRoles_admin/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "A dedicated collection to identify 'super admin' users. The mere existence of a document with a user's `userId` as its ID grants them global administrative privileges (DBAC - Existence over Content)."
         }
       }
     ],
-    "reasoning": "This Firestore structure prioritizes Authorization Independence and QAPs. The core strategy revolves around path-based ownership for user-related data and separate collections for global data. Aadhar verification details are stored within a subcollection of the user, ensuring data locality and ease of management. Denormalization is used to avoid complex `get()` calls in security rules.\n\n1.  **Users Collection:** `/users/{userId}` stores user profiles.  This uses path-based ownership for simple security rules.\n2.  **AadharVerification Subcollection:** `/users/{userId}/aadharVerifications/{verificationId}` stores Aadhar verification requests. Storing it as a subcollection ensures that verification data is always tied to a specific user, simplifying security rules and data management.  Crucially, it allows secure creation since the user document already exists (or will be created in the same atomic batch).  This avoids `get()` calls in the security rules.\n3.  **HazardReports Collection:** `/users/{userId}/hazardReports/{hazardReportId}` stores reports created by a user.\n4.  **SocialMediaPosts Collection:** `/socialMediaPosts/{socialMediaPostId}`. This segregation supports QAPs by allowing listing all posts without requiring filtering based on user roles or permissions within the rules themselves.\n5.  **NeedRequests Collection:** `/needRequests/{needRequestId}`. A separate collection for assistance requests allows volunteers and managers to query all open needs without complex user-based lookups, speeding up response times."
+    "reasoning": "The Firestore data structure is designed to adhere strictly to the CORE DESIGN PRINCIPLES and DESIGN STRATEGY MANDATES, prioritizing Authorization Independence, Structural Segregation, and clear Access Modeling.The primary strategy for Authorization Independence is **denormalization**. Key authorization fields like `userId`, `reporterId`, and `issuedByUserId` are explicitly included in the documents where they are needed for access control. This eliminates the need for `get()` calls in security rules, making rules atomic, simpler, and less prone to breaking transactions or batches. For instance, `HazardReport` and `MediaAttachment` documents include `reporterId`, allowing direct `request.auth.uid == resource.data.reporterId` checks.\n\n**Structural Segregation** is heavily employed to achieve **QAP-compliant (Query As Policy) list operations**. Instead of using security rules as filters, data is segregated into collections with homogeneous security postures:\n\n1.  **User Profiles:** Instead of a single `/users` collection with various profile types as subdocuments or fields, distinct collections like `/citizenProfiles/{userId}`, `/disasterManagerProfiles/{userId}`, etc., are used. This ensures that all documents within a given profile collection share the same access patterns (owned by `userId`), simplifying rules and allowing direct querying of specific user types. The `userId` field is explicitly denormalized into each profile document for atomic ownership checks.\n2.  **Hazard Reports & Media:** This is a critical area for segregation. Reports naturally transition through `pending`, `under_review`, and `verified` states, each requiring different visibility. Mixing these in one collection would necessitate complex rule filtering for `list` operations. Therefore:\n    *   `/hazardReports_pending/{reportId}`: Stores reports that are awaiting review or are otherwise not yet public. Access is restricted to the `reporterId` and authorized `disasterManagers`. Disaster managers can query this collection to view all reports requiring their attention.\n    *   `/hazardReports_public/{reportId}`: Stores reports that have been `verified` and are intended for public consumption. This collection is globally readable, allowing dashboards and map visualizations to `list` reports efficiently without rules acting as filters. This design ensures that public list operations are inherently secure and efficient.\n    *   `MediaAttachment` subcollections follow the same segregation pattern, with `/hazardReports_pending/{reportId}/mediaAttachments` and `/hazardReports_public/{reportId}/mediaAttachments` to maintain consistency with their parent reports' security postures. The `reporterId` is also denormalized into each `MediaAttachment` document for robust access checks.\n\n**Access Modeling** standardizes on:\n*   **Path-Based Ownership:** For private user data and profiles (e.g., `/citizenProfiles/{userId}`), where `request.auth.uid` must match `{userId}`.\n*   **Existence over Content:** For global roles like 'admin' where a document's mere existence (e.g., `/appRoles_admin/{userId}`) grants a role, making role checks simple and fast.\n*   **Embedded Roles:** The `accessLevel` field within `disasterManagerProfiles/{userId}` provides fine-grained, DBAC-compliant permissions for authorized personnel.\n\nThis structure ensures clear intent for security rules, robust authorization independence, and efficient querying for all user roles and data types, directly supporting the required QAPs and the application's core features like map visualization and filtering."
   }
 }

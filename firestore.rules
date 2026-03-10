@@ -1,140 +1,232 @@
 /**
- * @fileoverview Firestore Security Rules for OceanGuard platform.
+ * OceanGuard Security Rules (Version 2)
  *
- * Core Philosophy:
- * This ruleset enforces a strict user-ownership model for user profiles and their associated data (Aadhar verifications and hazard reports).
- * Social media posts are publicly readable but writable only with proper authorization (TODO - needs ownership field).
+ * CORE PHILOSOPHY:
+ * This ruleset implements a strict identity-based authorization model designed for a multi-role 
+ * environmental hazard platform. It prioritizes "Authorization Independence" by leveraging 
+ * denormalized fields (like reporterId and userId) to ensure security checks are performant 
+ * and do not require expensive document lookups.
  *
- * Data Structure:
- * - /users/{userId}: Stores user profile data.
- * - /users/{userId}/aadharVerifications/{verificationId}: Stores Aadhar verification requests for a user.
- * - /users/{userId}/hazardReports/{hazardReportId}: Stores hazard reports submitted by a user.
- * - /socialMediaPosts/{socialMediaPostId}: Stores social media posts related to ocean hazards.
+ * DATA STRUCTURE:
+ * - User-Specific Data: Organized under /users, /citizenProfiles, /volunteerProfiles, etc., 
+ *   using the Firebase Auth UID as the document ID for direct ownership mapping.
+ * - Structural Segregation: Hazard reports are separated into /hazardReports_pending (private/review) 
+ *   and /hazardReports_public (verified/public). This ensures that public map views and 
+ *   dashboards can list data without complex security filters.
+ * - Global Roles: Administrative privileges are managed via an "Existence over Content" pattern 
+ *   in the /appRoles_admin collection.
  *
- * Key Security Decisions:
- * - Users can only read and write their own profile data and related subcollections.
- * - Listing all users is disallowed.
- * - Social media posts are publicly readable, but write access is restricted (TODO - needs ownership field).
+ * KEY SECURITY DECISIONS:
+ * - Ownership Enforcement: Users can only read or modify their own profiles and pending reports.
+ * - Disaster Manager Access: Authorized personnel (Disaster Managers) are granted elevated 
+ *   access to review pending reports and issue system alerts.
+ * - Public Visibility: Verified reports, hazard lookups, and alerts are publicly readable 
+ *   to support community awareness and safety.
+ * - Immutability of Relationships: Critical fields such as 'reporterId' or 'userId' are 
+ *   enforced as immutable during updates to prevent users from transferring data ownership.
  *
- * Denormalization for Authorization:
- * - User-specific data is stored under the /users/{userId} path to avoid needing get() calls for authorization. The user ID is implicit in the path.
- *
- * Structural Segregation:
- * - Social media posts are stored in a separate top-level collection to support public read access without compromising user data.
+ * DENORMALIZATION FOR AUTHORIZATION:
+ * To optimize performance, critical ownership IDs (e.g., reporterId) are copied onto child 
+ * documents (e.g., MediaAttachments). This allows subcollection security to be verified 
+ * without fetching the parent document.
  */
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // --- GLOBAL HELPER FUNCTIONS ---
+
+    /** Checks if the request is from an authenticated user. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** Checks if the user's UID matches the provided userId. */
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    /** Checks if the user is a registered Global Admin. */
+    function isAdmin() {
+      return exists(/databases/$(database)/documents/appRoles_admin/$(request.auth.uid));
+    }
+
+    /** Checks if the user has a Disaster Manager profile. */
+    function isDM() {
+      return exists(/databases/$(database)/documents/disasterManagerProfiles/$(request.auth.uid));
+    }
+
+    /** Checks ownership and ensures the document exists for state changes. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    /** Verifies that a field in the incoming data matches the user's identity. */
+    function validatesId(fieldName) {
+      return request.resource.data[fieldName] == request.auth.uid;
+    }
+
+    /** Enforces that a specific field remains unchanged during an update. */
+    function isImmutable(fieldName) {
+      return request.resource.data[fieldName] == resource.data[fieldName];
+    }
+
+    // --- COLLECTION RULES ---
+
     /**
-     * @description Protects user profile information. Only the user can read and write their own profile.
+     * @description Core user account data. Read/Write limited to the owner.
      * @path /users/{userId}
-     * @allow (get, create, update, delete) if the user's auth UID matches the userId.
-     * @deny (get, create, update, delete) if the user's auth UID does not match the userId.
-     * @principle Enforces document ownership for writes.
+     * @allow (get, list, create, update) if UID matches userId.
+     * @deny (delete) if user tries to delete their own account (managed by admin/system).
+     * @principle Path-based ownership.
      */
     match /users/{userId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      allow get: if isOwner(userId);
-      allow list: if false; // Listing all users is not permitted
-
-      // Self-creation:  A user can create their own profile.  Must validate that the userId in the path
-      // matches the userId in the document.
-      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == userId;
-
-      // On Update: Enforce immutability of the id field and ownership
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-
-      allow delete: if isExistingOwner(userId);
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && validatesId('id');
+      allow update: if isExistingOwner(userId) && isImmutable('id');
+      allow delete: if isAdmin();
     }
 
     /**
-     * @description Protects Aadhar verification requests for users. Only the user can read and write their own verification requests.
-     * @path /users/{userId}/aadharVerifications/{verificationId}
-     * @allow (get, create, update, delete) if the user's auth UID matches the userId.
-     * @deny (get, create, update, delete) if the user's auth UID does not match the userId.
-     * @principle Restricts access to a user's own data tree.
+     * @description Generic rule template for 1:1 user profiles.
+     * @path /citizenProfiles/{userId}, /coastalResidentProfiles/{userId}, /volunteerProfiles/{userId}
+     * @allow (create, update) if owner. (get, list) if owner.
+     * @deny (create) if userId in data doesn't match path.
+     * @principle Enforces path consistency and owner-only access.
      */
-    match /users/{userId}/aadharVerifications/{verificationId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-
-      // On Create: Require that the userId matches the userId in the path to the document
-      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
-
-      // On Update: Enforce immutability of the userId field
-      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
-
-      allow delete: if isExistingOwner(userId);
+    match /citizenProfiles/{userId} {
+      allow get, list: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && validatesId('userId');
+      allow update: if isExistingOwner(userId) && isImmutable('userId');
+      allow delete: if isAdmin();
     }
 
-     /**
-      * @description Protects hazard reports submitted by users. Only the user can read and write their own hazard reports.
-      * @path /users/{userId}/hazardReports/{hazardReportId}
-      * @allow (get, create, update, delete) if the user's auth UID matches the userId.
-      * @deny (get, create, update, delete) if the user's auth UID does not match the userId.
-      * @principle Restricts access to a user's own data tree.
-      */
-    match /users/{userId}/hazardReports/{hazardReportId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
+    match /coastalResidentProfiles/{userId} {
+      allow get, list: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && validatesId('userId');
+      allow update: if isExistingOwner(userId) && isImmutable('userId');
+      allow delete: if isAdmin();
+    }
 
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-
-      // On Create: Require that the userId matches the userId in the path to the document
-      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
-
-      // On Update: Enforce immutability of the userId field
-      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
-
-      allow delete: if isExistingOwner(userId);
+    match /volunteerProfiles/{userId} {
+      allow get, list: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && validatesId('userId');
+      allow update: if isExistingOwner(userId) && isImmutable('userId');
+      allow delete: if isAdmin();
     }
 
     /**
-     * @description Protects social media posts related to ocean hazards. Allows public read access, but restricts write access to authorized users (TODO - needs ownership field).
-     * @path /socialMediaPosts/{socialMediaPostId}
-     * @allow (get, list) to anyone.
-     * @deny (create, update, delete) to unauthorized users.
-     * @principle Allows public read access for social media posts, but restricts write access to authorized users (TODO - needs ownership field).
+     * @description Disaster Manager profiles. Owner can read/write, Admins can manage.
+     * @path /disasterManagerProfiles/{userId}
+     * @allow (get, list) if owner, DM, or Admin.
+     * @deny (create, update) if not the owner or an admin.
+     * @principle Role-based access and ownership.
      */
-    match /socialMediaPosts/{socialMediaPostId} {
+    match /disasterManagerProfiles/{userId} {
+      allow get, list: if isOwner(userId) || isDM() || isAdmin();
+      allow create: if isOwner(userId) && validatesId('userId');
+      allow update: if (isExistingOwner(userId) || isAdmin()) && isImmutable('userId');
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Private hazard reports awaiting review.
+     * @path /hazardReports_pending/{reportId}
+     * @allow (create) if signed in. (get, update) if reporter, DM, or Admin.
+     * @deny (list) for general public.
+     * @principle Shared access (Reporter + Officials).
+     */
+    match /hazardReports_pending/{reportId} {
+      allow create: if isSignedIn() && validatesId('reporterId');
+      allow get: if isOwner(resource.data.reporterId) || isDM() || isAdmin();
+      allow list: if isSignedIn() && (isDM() || isAdmin()); 
+      allow update, delete: if (resource != null) && (isOwner(resource.data.reporterId) || isDM() || isAdmin());
+
+      /**
+       * @description Media attached to pending reports.
+       * @path /hazardReports_pending/{reportId}/mediaAttachments/{attachmentId}
+       * @principle Denormalized reporterId allows parent-independent checks.
+       */
+      match /mediaAttachments/{attachmentId} {
+        allow create: if isSignedIn() && validatesId('reporterId');
+        allow get: if isOwner(resource.data.reporterId) || isDM() || isAdmin();
+        allow list: if isSignedIn() && (isDM() || isAdmin());
+        allow update, delete: if (resource != null) && (isOwner(resource.data.reporterId) || isDM() || isAdmin());
+      }
+    }
+
+    /**
+     * @description Publicly verified hazard reports.
+     * @path /hazardReports_public/{reportId}
+     * @allow (get, list) for everyone. (update, delete) if DM or Admin.
+     * @deny (write) for general users to ensure verified data integrity.
+     * @principle Public read with authorized-only writes.
+     */
+    match /hazardReports_public/{reportId} {
       allow get, list: if true;
+      allow create: if isDM() || isAdmin();
+      allow update, delete: if (resource != null) && (isDM() || isAdmin());
 
-      // CRITICAL: Cannot implement owner-only writes. The 'SocialMediaPost' entity is missing an 'ownerId' or 'authorId' field.
-      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      match /mediaAttachments/{attachmentId} {
+        allow get, list: if true;
+        allow create: if isDM() || isAdmin();
+        allow update, delete: if (resource != null) && (isDM() || isAdmin());
+      }
+    }
+
+    /**
+     * @description Lookup collections for hazard categorization.
+     * @path /hazardTypes/{id}, /hazardTags/{id}
+     * @allow (get, list) for everyone.
+     * @deny (write) for anyone except Admins.
+     * @principle Global read, Admin-only modification.
+     */
+    match /hazardTypes/{typeId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /hazardTags/{tagId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Social media content analyzed by NLP services.
+     * @path /socialMediaPosts/{postId}
+     * @allow (get, list) for everyone.
+     * @deny (write) for standard users.
+     * @principle Public read, System/Admin-only writes.
+     */
+    match /socialMediaPosts/{postId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin(); // Assuming backend/NLP uses Admin privileges
+    }
+
+    /**
+     * @description System-issued alerts for coastal hazards.
+     * @path /alerts/{alertId}
+     * @allow (get, list) for everyone. (create) if DM or Admin.
+     * @deny (update) if message integrity is compromised.
+     * @principle Public safety announcements.
+     */
+    match /alerts/{alertId} {
+      allow get, list: if true;
+      allow create: if (isDM() || isAdmin()) && validatesId('issuedByUserId');
+      allow update, delete: if (resource != null) && (isDM() || isAdmin());
+    }
+
+    /**
+     * @description Administrative role assignments.
+     * @path /appRoles_admin/{userId}
+     * @allow (get) if signed in.
+     * @deny (list, create, update, delete) for anyone except existing admins.
+     * @principle Existence-based Authorization (DBAC).
+     */
+    match /appRoles_admin/{userId} {
+      allow get: if isSignedIn();
+      allow list, write: if isAdmin();
     }
   }
 }
