@@ -1,5 +1,27 @@
 # SamudraSetu - An Integrated Intelligence Platform for INCOIS
 
+## Abstract: SamudraSetu - An AI-Powered Intelligence Platform for Ocean Hazard Resilience
+
+**Introduction:**
+India's extensive coastline is highly vulnerable to a range of ocean-related hazards, including tsunamis, storm surges, and coastal flooding. The Indian National Centre for Ocean Information Services (INCOIS) provides critical early warnings using sophisticated scientific models. However, a significant gap exists between these official forecasts and the real-time, on-the-ground reality. This gap comprises two main challenges: a lack of immediate, verifiable field reports from affected citizens and the inability to harness the vast, unstructured data from public discussions on social media during a crisis. SamudraSetu is a web-based, AI-driven intelligence platform designed to bridge this critical information gap. It transforms the traditional one-way communication of alerts into a dynamic, two-way intelligence loop, empowering citizens and providing disaster management agencies with a comprehensive, real-time operational picture.
+
+**Core Solution & Features:**
+SamudraSetu directly addresses the INCOIS problem statement by integrating crowdsourcing with advanced AI analysis through a suite of tangible, working features:
+
+1. **AI-Assisted Citizen Reporting:** The platform's core is the "Report a Hazard" feature, which allows users to submit geotagged reports of observed hazards. To streamline this process, the system employs an innovative AI workflow. Users can upload a photo or use their webcam to capture an image, which is then sent to a Google Gemini Vision model via a Genkit AI flow. The AI analyzes the image and automatically pre-fills the report form with the identified hazard type, severity level, and a detailed description, drastically reducing the time and effort required to submit a report while increasing data accuracy.
+
+2. **Automated Authenticity Verification:** To ensure the credibility of crowdsourced data, every text-based report is automatically analyzed by a `verifyReportAuthenticity` AI flow. This system uses a specialized BERT (Bidirectional Encoder Representations from Transformers) model, fine-tuned on misinformation datasets, to calculate an "authenticity score." This score is transparently displayed to all users, helping them distinguish between credible alerts and potential misinformation.
+
+3. **Social Media Intelligence:** The "Social Intelligence Dashboard" leverages a Natural Language Processing (NLP) engine to analyze trends from public social media feeds. This system identifies public sentiment, calculates an urgency score, and extracts key discussion topics and hashtags. By turning unstructured social chatter into actionable insights, it helps agencies understand the public's awareness, concerns, and the ground-level impact of a hazard event.
+
+4. **Unified Interactive Dashboard:** The central hub of the platform is a live, interactive dashboard built on the Google Maps API. It visualizes all hazard reports and real-time data from integrated IoT sensors (like smart buoys) on a single map. With features like dynamic heatmaps and marker clustering, disaster managers can instantly identify hotspots, understand the scale of an event, and allocate resources more effectively.
+
+**Technical Architecture:**
+SamudraSetu is built on a modern, robust, and scalable technology stack:
+- **Frontend:** A responsive and interactive user interface built with **Next.js** and **React**, using **TypeScript** for type safety. The UI is composed of beautifully designed, accessible components from **ShadCN UI**, styled with **Tailwind CSS**.
+- **AI Backend:** All AI-powered functionalities are orchestrated by **Google Genkit**, which runs as a dedicated server. It manages calls to **Google Gemini** for multimodal analysis and content generation, and to a local **BERT model** for authenticity scoring.
+- **Backend Services:** User management and authentication are securely handled by **Firebase Authentication**, utilizing OTP-based phone login. **Firestore** is the intended backend database for storing all user data and reports.
+
 ## The Core Idea: Solving the INCOIS Problem Statement
 
 **SamudraSetu** is an AI-driven, web-based intelligence platform designed as a direct response to a critical challenge faced by the **Indian National Centre for Ocean Information Services (INCOIS)**. While INCOIS excels at issuing early warnings for ocean hazards using sophisticated models, it operates with two significant information gaps:
