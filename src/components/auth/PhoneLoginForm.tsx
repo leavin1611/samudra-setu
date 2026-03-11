@@ -56,7 +56,7 @@ export function PhoneLoginForm() {
       window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
         'size': 'invisible',
         'callback': (response: any) => {
-          // reCAPTCHA solved, allow signInWithPhoneNumber.
+          // reCAPTCHA solved
         }
       });
     }
@@ -91,7 +91,6 @@ export function PhoneLoginForm() {
       }
 
        if (window.recaptchaVerifier) {
-          // Reset reCAPTCHA on error to allow retry
           try {
             // @ts-ignore
             window.recaptchaVerifier.clear();
@@ -144,11 +143,12 @@ export function PhoneLoginForm() {
                 {billingError && (
                   <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Billing Required for SMS</AlertTitle>
-                    <AlertDescription className="space-y-2">
-                      <p>Firebase Phone Authentication requires the <strong>Blaze Plan</strong> for real SMS delivery.</p>
-                      <div className="bg-destructive/10 p-2 rounded text-xs">
-                        <strong>Developer Tip:</strong> You can use <strong>test phone numbers</strong> for free in the Firebase Console (Auth -> Settings -> Phone numbers for testing).
+                    <AlertTitle>Billing Required for Real SMS</AlertTitle>
+                    <AlertDescription className="space-y-4">
+                      <p>Firebase Phone Authentication requires the <strong>Blaze Plan</strong> for real SMS delivery to your phone.</p>
+                      <div className="bg-destructive/10 p-3 rounded-md text-sm border border-destructive/20">
+                        <p className="font-bold mb-1">Free Way to Test:</p>
+                        <p>You can add <strong>"test phone numbers"</strong> in the Firebase Console (Auth -> Settings -> Phone numbers for testing). These work for free even on the Spark plan.</p>
                       </div>
                     </AlertDescription>
                   </Alert>

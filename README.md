@@ -17,28 +17,22 @@ SamudraSetu directly addresses the INCOIS problem statement by integrating crowd
 
 4. **Unified Interactive Dashboard:** The central hub of the platform is a live, interactive dashboard built on the Google Maps API. It visualizes all hazard reports and real-time data from integrated IoT sensors (like smart buoys) on a single map. With features like dynamic heatmaps and marker clustering, disaster managers can instantly identify hotspots, understand the scale of an event, and allocate resources more effectively.
 
-## Technical Summary
-- **Frontend**: Next.js 15 (App Router), React, TypeScript, Tailwind CSS, ShadCN UI.
-- **AI Backend**: Google Genkit, Google Gemini (Multimodal), BERT (Authenticity Analysis).
-- **Backend Services**: Firebase Authentication (OTP Login), Firestore (Scalable Database).
-- **Maps**: Google Maps JS API (Heatmaps, Clustering).
-
 ## Deployment & Setup
 
-### Setting up OTP Login (Phone Authentication)
+### Setting up FREE OTP Login (Phone Authentication)
+Real SMS delivery requires a paid plan, but you can test it for **FREE** using test numbers:
 1. Go to the **Firebase Console**.
-2. Navigate to **Authentication** > **Sign-in method**.
-3. Enable **Phone** authentication.
-4. **Important**: Real SMS delivery requires the **Blaze (Pay-as-you-go) Plan**.
-5. **For Testing**: You can add "Phone numbers for testing" in the Phone auth settings. These work for free even on the Spark plan. Use these numbers in the login form to bypass real SMS costs during development.
+2. Navigate to **Authentication** > **Settings** > **Phone numbers for testing**.
+3. Add a test phone number (e.g., `+91 98765 43210`) and a verification code (e.g., `123456`).
+4. You can now use this phone number and code in the login form to test the flow without any billing enabled.
 
 ### Setting Secrets
 Ensure the following secrets are added to your App Hosting backend in the Firebase Console:
 - `GEMINI_API_KEY`: Your Google AI Studio API key.
 - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`: Your Google Maps JavaScript API key.
 
-## Getting Started Locally
-
-1. Install dependencies: `npm install`
-2. Start the web app: `npm run dev`
-3. Start the AI server: `npm run genkit:dev` (in a separate terminal)
+## Technical Summary
+- **Frontend**: Next.js 15 (App Router), React, TypeScript, Tailwind CSS, ShadCN UI.
+- **AI Backend**: Google Genkit, Google Gemini (Multimodal), BERT (Authenticity Analysis).
+- **Backend Services**: Firebase Authentication (OTP Login), Firestore (Scalable Database).
+- **Maps**: Google Maps JS API (Heatmaps, Clustering).
