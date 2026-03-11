@@ -1,3 +1,4 @@
+
 # SamudraSetu - An Integrated Intelligence Platform for INCOIS
 
 ## Abstract: SamudraSetu - An AI-Powered Intelligence Platform for Ocean Hazard Resilience
@@ -19,29 +20,16 @@ SamudraSetu directly addresses the INCOIS problem statement by integrating crowd
 ## RESEARCH AND REFERENCES
 
 1. AI Models & Natural Language Processing
-
-BERT (Bidirectional Encoder Representations from Transformers): The core algorithm for our authenticity scoring, using a model fine-tuned on the Fakeddit dataset to spot misinformation.
-- Paper: [arxiv.org/abs/1810.04805](https://arxiv.org/abs/1810.04805)
-- Dataset: [arxiv.org/abs/1911.03854](https://arxiv.org/abs/1911.03854)
-
-Google Gemini (Multimodal Models): The model family powering our image analysis (photo-to-report) and social media intelligence features.
-- Reference: [deepmind.google/technologies/gemini](https://deepmind.google/technologies/gemini/)
+- BERT (Bidirectional Encoder Representations from Transformers): Core algorithm for authenticity scoring.
+- Google Gemini (Multimodal Models): Powering image analysis and social media intelligence.
 
 2. Crowdsourcing in Disaster Management
-
-Ushahidi Platform: A pioneering open-source project that proved the effectiveness of using citizen reporting for crisis mapping and social accountability.
-- Link: [www.ushahidi.com](https://www.ushahidi.com/)
-
-Volunteered Geographic Information (VGI): Academic research validating the use of crowdsourced geographic data during disasters for tasks like rapid flood damage estimation.
-- See: Poser, K., & Dransch, D. (2010).
+- Ushahidi Platform: Proven effectiveness for crisis mapping.
+- Volunteered Geographic Information (VGI): Validated research for rapid damage estimation.
 
 3. Coastal Hazard & Disaster Management
-
-Indian National Centre for Ocean Information Services (INCOIS): The primary stakeholder and source for the problem statement. Their work provides the official framework for our solution.
-- Link: [www.incois.gov.in](https://www.incois.gov.in/)
-
-National Disaster Management Authority (NDMA), India: The apex body for disaster management in India, providing the strategic context for integrating technology into national response plans.
-- Link: [ndma.gov.in](https://ndma.gov.in/)
+- Indian National Centre for Ocean Information Services (INCOIS): Primary stakeholder and data source.
+- National Disaster Management Authority (NDMA), India: Strategic context for technology integration.
 
 ## Deployment Instructions
 

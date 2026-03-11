@@ -12,9 +12,10 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/firebase';
 import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const phoneSchema = z.object({
   phoneNumber: z.string().regex(/^\+[1-9]\d{1,14}$/, 'Phone number must be in E.164 format (e.g., +919876543210)'),
@@ -40,6 +41,7 @@ export function PhoneLoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
+  const [billingError, setBillingError] = useState(false);
 
   const phoneForm = useForm<PhoneFormValues>({
     resolver: zodResolver(phoneSchema),
@@ -62,6 +64,7 @@ export function PhoneLoginForm() {
 
   const handleSendOtp: SubmitHandler<PhoneFormValues> = async (data) => {
     setIsLoading(true);
+    setBillingError(false);
     generateRecaptcha();
     
     const appVerifier = window.recaptchaVerifier!;
@@ -76,11 +79,17 @@ export function PhoneLoginForm() {
       });
     } catch (error: any) {
       console.error("Error sending OTP:", error);
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: error.message || 'Failed to send OTP. Please check the number and try again.',
-      });
+      
+      if (error.code === 'auth/billing-not-enabled') {
+        setBillingError(true);
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Uh oh! Something went wrong.',
+          description: error.message || 'Failed to send OTP. Please check the number and try again.',
+        });
+      }
+
        if (window.recaptchaVerifier) {
           // @ts-ignore
           const recaptcha = window.grecaptcha;
@@ -129,6 +138,15 @@ export function PhoneLoginForm() {
             </CardHeader>
             <form onSubmit={phoneForm.handleSubmit(handleSendOtp)}>
               <CardContent className="space-y-4">
+                {billingError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Billing Required</AlertTitle>
+                    <AlertDescription>
+                      Phone authentication requires the <strong>Blaze Plan</strong>. Please enable billing in your Firebase Console or use a test phone number configured in the Firebase Auth settings.
+                    </AlertDescription>
+                  </Alert>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="phoneNumber">Phone Number</Label>
                   <Input
