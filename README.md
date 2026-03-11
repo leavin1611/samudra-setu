@@ -16,12 +16,6 @@ SamudraSetu directly addresses the INCOIS problem statement by integrating crowd
 
 4. **Unified Interactive Dashboard:** The central hub of the platform is a live, interactive dashboard built on the Google Maps API. It visualizes all hazard reports and real-time data from integrated IoT sensors (like smart buoys) on a single map. With features like dynamic heatmaps and marker clustering, disaster managers can instantly identify hotspots, understand the scale of an event, and allocate resources more effectively.
 
-**Technical Architecture:**
-SamudraSetu is built on a modern, robust, and scalable technology stack:
-- **Frontend:** A responsive and interactive user interface built with **Next.js** and **React**, using **TypeScript** for type safety. The UI is composed of beautifully designed, accessible components from **ShadCN UI**, styled with **Tailwind CSS**.
-- **AI Backend:** All AI-powered functionalities are orchestrated by **Google Genkit**, which runs as a dedicated server. It manages calls to **Google Gemini** for multimodal analysis and content generation, and to a local **BERT model** for authenticity scoring.
-- **Backend Services:** User management and authentication are securely handled by **Firebase Authentication**, utilizing OTP-based phone login. **Firestore** is the intended backend database for storing all user data and reports.
-
 ## RESEARCH AND REFERENCES
 
 1. AI Models & Natural Language Processing
@@ -48,6 +42,19 @@ Indian National Centre for Ocean Information Services (INCOIS): The primary stak
 
 National Disaster Management Authority (NDMA), India: The apex body for disaster management in India, providing the strategic context for integrating technology into national response plans.
 - Link: [ndma.gov.in](https://ndma.gov.in/)
+
+## Deployment Instructions
+
+### Relinking GitHub
+If you have deleted your previous repository and created a new one, you must manually reconnect it in the Firebase Console:
+1. Go to **App Hosting** in the Firebase Console.
+2. Delete the old backend.
+3. Create a new backend and select the new repository.
+
+### Setting Secrets
+Ensure the following secrets are added to your App Hosting backend in the Firebase Console:
+- `GEMINI_API_KEY`: Your Google AI Studio API key.
+- `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`: Your Google Maps JavaScript API key.
 
 ## Getting Started Locally
 
