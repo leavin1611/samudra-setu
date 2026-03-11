@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/firebase';
 import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, Info } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -91,10 +91,13 @@ export function PhoneLoginForm() {
       }
 
        if (window.recaptchaVerifier) {
-          // @ts-ignore
-          const recaptcha = window.grecaptcha;
-          if (recaptcha && window.recaptchaVerifier.widgetId !== undefined) {
-            recaptcha.reset(window.recaptchaVerifier.widgetId);
+          // Reset reCAPTCHA on error to allow retry
+          try {
+            // @ts-ignore
+            window.recaptchaVerifier.clear();
+            window.recaptchaVerifier = undefined;
+          } catch (e) {
+            console.error("Error clearing reCAPTCHA", e);
           }
         }
     } finally {
@@ -141,12 +144,21 @@ export function PhoneLoginForm() {
                 {billingError && (
                   <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Billing Required</AlertTitle>
-                    <AlertDescription>
-                      Phone authentication requires the <strong>Blaze Plan</strong>. Please enable billing in your Firebase Console or use a test phone number configured in the Firebase Auth settings.
+                    <AlertTitle>Billing Required for SMS</AlertTitle>
+                    <AlertDescription className="space-y-2">
+                      <p>Firebase Phone Authentication requires the <strong>Blaze Plan</strong> for real SMS delivery.</p>
+                      <div className="bg-destructive/10 p-2 rounded text-xs">
+                        <strong>Developer Tip:</strong> You can use <strong>test phone numbers</strong> for free in the Firebase Console (Auth -> Settings -> Phone numbers for testing).
+                      </div>
                     </AlertDescription>
                   </Alert>
                 )}
+                
+                <div className="bg-blue-50 p-3 rounded-md flex items-start gap-2 text-blue-700 text-sm">
+                   <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                   <p>Ensure your number includes the country code (e.g., +91 for India).</p>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="phoneNumber">Phone Number</Label>
                   <Input

@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -231,8 +232,7 @@
           "description": "The coastal region where the volunteer typically operates ('east', 'west', 'south', 'islands')."
         },
         "skillsExpertise": {
-          "type": "array",
-          "description": "A list of skills or areas of expertise the volunteer possesses (e.g., 'First Aid', 'Water Rescue', 'GIS Mapping').",
+          "array": "A list of skills or areas of expertise the volunteer possesses (e.g., 'First Aid', 'Water Rescue', 'GIS Mapping').",
           "items": {
             "type": "string"
           }
@@ -740,6 +740,7 @@
   "auth": {
     "providers": [
       "password",
+      "phone",
       "anonymous"
     ]
   },

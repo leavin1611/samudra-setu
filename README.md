@@ -17,27 +17,20 @@ SamudraSetu directly addresses the INCOIS problem statement by integrating crowd
 
 4. **Unified Interactive Dashboard:** The central hub of the platform is a live, interactive dashboard built on the Google Maps API. It visualizes all hazard reports and real-time data from integrated IoT sensors (like smart buoys) on a single map. With features like dynamic heatmaps and marker clustering, disaster managers can instantly identify hotspots, understand the scale of an event, and allocate resources more effectively.
 
-## RESEARCH AND REFERENCES
+## Technical Summary
+- **Frontend**: Next.js 15 (App Router), React, TypeScript, Tailwind CSS, ShadCN UI.
+- **AI Backend**: Google Genkit, Google Gemini (Multimodal), BERT (Authenticity Analysis).
+- **Backend Services**: Firebase Authentication (OTP Login), Firestore (Scalable Database).
+- **Maps**: Google Maps JS API (Heatmaps, Clustering).
 
-1. AI Models & Natural Language Processing
-- BERT (Bidirectional Encoder Representations from Transformers): Core algorithm for authenticity scoring.
-- Google Gemini (Multimodal Models): Powering image analysis and social media intelligence.
+## Deployment & Setup
 
-2. Crowdsourcing in Disaster Management
-- Ushahidi Platform: Proven effectiveness for crisis mapping.
-- Volunteered Geographic Information (VGI): Validated research for rapid damage estimation.
-
-3. Coastal Hazard & Disaster Management
-- Indian National Centre for Ocean Information Services (INCOIS): Primary stakeholder and data source.
-- National Disaster Management Authority (NDMA), India: Strategic context for technology integration.
-
-## Deployment Instructions
-
-### Relinking GitHub
-If you have deleted your previous repository and created a new one, you must manually reconnect it in the Firebase Console:
-1. Go to **App Hosting** in the Firebase Console.
-2. Delete the old backend.
-3. Create a new backend and select the new repository.
+### Setting up OTP Login (Phone Authentication)
+1. Go to the **Firebase Console**.
+2. Navigate to **Authentication** > **Sign-in method**.
+3. Enable **Phone** authentication.
+4. **Important**: Real SMS delivery requires the **Blaze (Pay-as-you-go) Plan**.
+5. **For Testing**: You can add "Phone numbers for testing" in the Phone auth settings. These work for free even on the Spark plan. Use these numbers in the login form to bypass real SMS costs during development.
 
 ### Setting Secrets
 Ensure the following secrets are added to your App Hosting backend in the Firebase Console:
